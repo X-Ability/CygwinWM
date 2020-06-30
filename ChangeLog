@@ -1,0 +1,63 @@
+version 06/10/2020
+* Added Customized OpenBabel
+* Revised MKTOP
+version 03/06/2020
+* Added MKTOP
+version 02/13/2020
+* Modified cygwin installer
+version 01/30/2020
+* Added MX_TRAP.sh
+version 08/08/2019
+* Revised filelist_cygwinwm.txt
+version 07/25/2019
+* Fixed the problem that ERmod is very slow
+* Enabled to run Cygwin.bat from any install folder
+version 07/10/2019
+* Added packmol
+* Enabled MODYLAS serial execution
+version 04/02/2019
+* Updated AmberTools to 18 and Acpype to corresponding revision
+* Changed BoltTraP log file name
+version 11/19/2018
+* Modified cygwin installer
+version 07/27/2018
+* Modified BoltzTraP
+version 05/10/2018
+* Added Phonopy
+* Added MDTraj
+* Added BoltzTraP
+* Chanegd to install manually OpenBabel and Grace
+* Reinstalled all packages with latest cygwin installer
+version 10/27/2017
+* Added Ghostscript 9.19-1
+* Reinstalled all packages with latest cygwin installer
+version 10/02/2017
+* Update Gromacs to 5.0.7
+* Reinstalled all packages with latest cygwin installer
+version 05/10/2017
+* Revised conditional ERmod
+version 04/05/2017
+* Installed gnuplot for OpenMX I/F.
+* Installed bc for Fragment ER.
+* Added ParmEd 2.7.3.
+* Added a file to check cygwin_wm.
+* Added some modules for Fragment ER.
+version 09/26/2016
+* Installed NWChem 6.6 with OpenMPI
+* Replaced OpenBabel with one installed from cygwin package
+* Update /usr/loca/acpype/acpype.py
+* Update /usr/loca/ermod
+version 01/14/2016
+* Update /usr/loca/acpype/acpype.py (enabled to use ether oxygen, harogen, and molecules including phosphorus)
+version 10/27/2015
+* Update /usr/local/ermod (compiled by Intel Core2 Penryn)
+version 10/06/2015
+* Deleted /usr/local/ermod-0.3.1.
+* Installed ERmod 0.3.2 into /usr/local/ermod.
+version 09/17/2015
+* Added GROMACS binaries for double precision.
+* Updated CMake.
+* Changed optimization flag for GROMACS with SSE (SSE4.1 -> SSE2).
+* Added ERmod 0.3.1.
+* Installed lapack, liblapack-devel, libnetcdf-devel and libopenmpi-devel to compile ERmod.
+* Installed numpy to use the scripts included in Winmostar V6.
