@@ -80,13 +80,3 @@ strLogFile = "/cygdrive/" & strShDir & "/cygwin_setup.log"
 cmd = "C:\cygwin_wm\bin\bash.exe --login -c """ & strShFile & " 2>&1 | tee " & strLogFile & """"
 objShell.Run cmd, 1, True
 
-' generate junction list 
-cmd = "cscript list_junction.vbs"
-objShell.Run cmd, 1, True
-
-' generate symlink list and delete symlinks
-strShFile  = "/cygdrive/" & strShDir & "/list_symlink.sh"
-cmd = "C:\cygwin_wm\bin\bash.exe --login -c """ & strShFile & """"
-objShell.Run cmd, 1, True
-
-

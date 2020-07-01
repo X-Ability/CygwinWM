@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function InstallMPICH2() {
   rm -rf /usr/local/mpich2-1.5
@@ -105,8 +105,6 @@ function InstallAmberTools18() {
   cp /tmp/parmchk2.c AmberTools/src/antechamber/
   make install AMBERBUILDFLAGS="-Wl,--allow-multiple-definition -DWITHOUT_BACKTRACE" || exit 1
   cd $dir
-  rm -rf /usr/local/amber18/test
-  rm -rf /usr/local/amber18/AmberTools
 }
 
 function InstallAcpype18() {
@@ -219,7 +217,6 @@ function InstallBoltzTraP() {
   make FOPT="-g -funroll-loops -O3 -ffast-math -fgcse-lm -fgcse-sm -ffast-math -ftree-vectorize -fexternal-blas" || exit 1
   cd ../..
   mv boltztrap-1.2.5/ /usr/local/
-  rm -rf /usr/local/boltztrap-1.2.5/tests
 }
 
 function InstallMATCH() {
@@ -265,9 +262,7 @@ function InstallEnumlib() {
   make enum.x || exit 1
   make polya.x || exit 1
   make makestr.x || exit 1
-  cd ..
-  rm -rf symlib tests
-  cd ..
+  cd ../..
   mv enumlib-1.0.8 /usr/local/enumlib
   export F90=
 }
@@ -321,6 +316,8 @@ function InstallPymatgen() {
   python3.7 setup.py install || exit 1
   cd ../..
   
+  pip3.7 install wheel || exit 1
+
   wget https://winmostar.com/wm/cygwin_wm/packages/matplotlib-3.1.0.zip
   rm -fr matplotlib-3.1.0
   unzip matplotlib-3.1.0.zip
@@ -461,8 +458,5 @@ InstallLammps
 
 # Make file list
 find /usr /bin /lib /etc /sbin -type f -print | grep -v -e ':' -e '\\' -e '*' -e '?' -e '<' -e '>' -e '|' -e '"' | sort > /cygdrive/c/cygwin_wm/filelist_cygwinwm.txt
-
-# Remove garbage files
-rm -rf /tmp/* /cygdrive/c/cygwin_wm/cygwin-packages /home/*
 
 date
