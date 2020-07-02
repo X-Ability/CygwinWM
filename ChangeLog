@@ -1,5 +1,11 @@
+version 07/02/2020
+* Added python3.7
+* Added pymatgen
+* Modified AmberTools to accelerate acpype
+* Changed MPI library from OpenMPI to MPICH2-1.5 for MODYLAS and OpenMX
+* Changed not to use CPU affinity mask for Gromacs
 version 06/10/2020
-* Added Customized OpenBabel
+* Added customized OpenBabel
 * Revised MKTOP
 version 03/06/2020
 * Added MKTOP
