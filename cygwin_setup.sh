@@ -454,6 +454,6 @@ InstallMktop
 InstallPymatgen
 InstallPhonopy
 InstallMDTraj
-InstallLammps
+#InstallLammps
 
 date
