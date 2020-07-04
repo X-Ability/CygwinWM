@@ -456,7 +456,4 @@ InstallPhonopy
 InstallMDTraj
 InstallLammps
 
-# Make file list
-find /usr /bin /lib /etc /sbin -type f -print | grep -v -e ':' -e '\\' -e '*' -e '?' -e '<' -e '>' -e '|' -e '"' | sort > /cygdrive/c/cygwin_wm/filelist_cygwinwm.txt
-
 date
