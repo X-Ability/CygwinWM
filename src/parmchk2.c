@@ -1936,6 +1936,7 @@ void chk_angle(void)
             for (kk = 0; kk < 6; kk++) {
                 k = atom[j].con[kk];
                 if(k < 0) continue;
+                if(i == k) continue;
                 {
                       {
                             {
