@@ -436,6 +436,10 @@ if [ ! -f /bin/hdf5.dll ]; then
   ln -s /bin/cyghdf5-103.dll /bin/hdf5.dll
 fi
 
+# os.symlink of python2.7 makes symbolic links to /mnt/ for windows paths
+ln -s /cygdrive /mnt
+
+
 InstallMPICH2
 InstallGrace
 InstallOpenBabel
