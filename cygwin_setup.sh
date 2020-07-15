@@ -1,8 +1,9 @@
 #!/bin/bash -x
 
+# Used for LAMMPS and QE
+# http://www.mpich.org/static/downloads/1.5/mpich2-1.5.tar.gz
 function InstallMPICH2() {
   rm -rf /usr/local/mpich2-1.5
-# http://www.mpich.org/static/downloads/1.5/mpich2-1.5.tar.gz
   wget https://winmostar.com/wm/cygwin_wm/packages/mpich2-1.5.tar.gz
   rm -fr mpich2-1.5
   tar xfz mpich2-1.5.tar.gz
@@ -13,6 +14,8 @@ function InstallMPICH2() {
   cd ..
 }
 
+# Grace in cygwin has a problem, so install it manually.
+# ftp://plasma-gate.weizmann.ac.il/pub/grace/src/grace5/
 function InstallGrace() {
   rm -rf /usr/local/grace
   wget https://winmostar.com/wm/cygwin_wm/packages/grace-5.1.25.tar.gz
@@ -25,6 +28,7 @@ function InstallGrace() {
   cd ..
 }
 
+# https://github.com/openbabel/openbabel/archive/openbabel-2-4-1.tar.gz
 function InstallOpenBabel() {
   rm -fr openbabel-2.4.1
   rm -f openbabel-2-4-1.obgmxtop.patch
@@ -41,6 +45,8 @@ function InstallOpenBabel() {
   cd ../..
 }
 
+# Since 5.1 and later are not compatible with gmx rdf, use 5.0.7.
+# http://www.gromacs.org/Downloads
 function InstallGromacs() {
   rm -rf /usr/local/gromacs_sse
   rm -rf /usr/local/gromacs_avx
@@ -89,6 +95,8 @@ function InstallGromacs() {
   cd ..
 }
 
+
+# http://ambermd.org/GetAmber.php#ambertools
 function InstallAmberTools18() {
   rm -rf /usr/local/amber18/
   dir=`pwd`
@@ -106,6 +114,7 @@ function InstallAmberTools18() {
   cd $dir
 }
 
+# http://svn.code.sf.net/p/ccpn/code/branches/stable/ccpn/python/acpype/
 function InstallAcpype18() {
   rm -rf /usr/local/acpype/ ./acpype_r10101
   wget https://winmostar.com/wm/cygwin_wm/packages/acpype_r10101.tgz
@@ -115,6 +124,7 @@ function InstallAcpype18() {
   mv acpype_r10101 /usr/local/acpype
 }
 
+# http://sourceforge.net/projects/ermod/files/?source=navbar
 function InstallERmod() {
   rm -rf /usr/local/ermod
   wget https://winmostar.com/wm/cygwin_wm/packages/ermod-0.3.4.tar.gz
@@ -130,6 +140,7 @@ function InstallERmod() {
   cd ..
 }
 
+# You must agree to the MODYLAS license in order to use MODYLAS.
 function InstallMODYLAS() {
   rm -rf /usr/local/MODYLAS_1.0.4
   rm -fr MODYLAS_1.0.4
@@ -144,6 +155,9 @@ function InstallMODYLAS() {
   cd ../../..
 }
 
+# Use OpenMX.3.8 and MX_TRANS.sh from OpenMX3.9
+# http://www.openmx-square.org/download.html
+# https://ja.osdn.net/projects/fermisurfer/releases/
 function InstallOpenMX() {
   rm -rf /usr/local/openmx3.8
   rm -rf /usr/local/fermisurfer
@@ -180,6 +194,7 @@ function InstallOpenMX() {
   mv MX_TRAP.sh /usr/local/openmx3.8/work/MX_TRAP.sh
 }
 
+# https://pypi.python.org/pypi/phonopy/1.12.6.53
 function InstallPhonopy() {
   pip3.7 install pkgconfig || exit 1
   pip3.7 install h5py || exit 1
@@ -192,6 +207,7 @@ function InstallPhonopy() {
   cd ..
 }
 
+# https://github.com/mdtraj/mdtraj/releases/tag/1.9.0
 function InstallMDTraj() {
   wget https://winmostar.com/wm/cygwin_wm/packages/mdtraj-1.9.0.tar.gz
   rm -fr mdtraj-1.9.0
@@ -202,6 +218,7 @@ function InstallMDTraj() {
   cd ..
 }
 
+# https://www.imc.tuwien.ac.at/forschungsbereich_theoretische_chemie/forschungsgruppen/prof_dr_gkh_madsen_theoretical_materials_chemistry/boltztrap/
 function InstallBoltzTraP() {
   rm -rf /usr/local/boltztrap-1.2.5
   wget https://winmostar.com/wm/cygwin_wm/packages/BoltzTraP.tar.bz2
@@ -210,11 +227,13 @@ function InstallBoltzTraP() {
   cd boltztrap-1.2.5/src/
   rm BoltzTraP
   sed -i s/:log/log/g x_trans
+  # To eliminate the dependence on the machine type
   make FOPT="-g -funroll-loops -O3 -ffast-math -fgcse-lm -fgcse-sm -ffast-math -ftree-vectorize -fexternal-blas" || exit 1
   cd ../..
   mv boltztrap-1.2.5/ /usr/local/
 }
 
+# https://brooks.chem.lsa.umich.edu/index.php?page=match&subdir=articles/resources/software
 function InstallMATCH() {
   rm -rf /usr/local/MATCH_RELEASE
   wget https://winmostar.com/wm/cygwin_wm/packages/MATCH_RELEASE.tar.gz
@@ -222,6 +241,7 @@ function InstallMATCH() {
   mv MATCH_RELEASE /usr/local/
 }
 
+# http://sourceforge.net/projects/ermod/files/?source=navbar
 function InstallConditionalERmod() {
   rm -rf /usr/local/ermod_conditional
   wget https://winmostar.com/wm/cygwin_wm/packages/ermod-0.3.5.tar.gz
@@ -238,6 +258,9 @@ function InstallConditionalERmod() {
   cd ..
 }
 
+# Used for structure generation from occupancy in Crystal Builder
+# https://github.com/msg-byu/enumlib/tree/v1.0.8
+# https://github.com/msg-byu/symlib/tree/v1.1.0
 function InstallEnumlib() {
   rm -rf /usr/local/enumlib
   wget https://winmostar.com/wm/cygwin_wm/packages/enumlib-1.0.8.zip
@@ -258,6 +281,7 @@ function InstallEnumlib() {
   export F90=
 }
 
+# https://github.com/mcubeg/packmol/releases
 function InstallPackmol() {
   rm -rf /usr/local/packmol-18.166
   wget https://winmostar.com/wm/cygwin_wm/packages/packmol-18.166.zip
@@ -271,6 +295,7 @@ function InstallPackmol() {
   mv packmol-18.166 /usr/local/
 }
 
+# http://www.aribeiro.net.br/mktop/
 function InstallMktop() {
   rm -rf /usr/local/mktop_2.2.1
   wget https://winmostar.com/wm/cygwin_wm/packages/mktop_2.2.1.tar
@@ -284,7 +309,7 @@ function InstallMktop() {
   mv mktop_2.2.1 /usr/local/
 }
 
-# If setup.py returns an error, launch C:\cygwin_wm\bin\ash.exe and execute "cd /bin" and "./rebaseall".
+# https://github.com/cython/cython/tree/0.29.13
 function InstallCython() {
   wget https://winmostar.com/wm/cygwin_wm/packages/cython-0.29.13.zip
   rm -fr cython-0.29.13
@@ -294,6 +319,7 @@ function InstallCython() {
   cd ..
 }
 
+# https://github.com/scipy/scipy/tree/v1.1.0
 function InstallScypy() {
   wget https://winmostar.com/wm/cygwin_wm/packages/scipy-1.1.0.zip
   rm -fr scipy-1.1.0
@@ -303,6 +329,7 @@ function InstallScypy() {
   cd ..
 }
 
+# https://github.com/spglib/spglib/tree/v1.15.1
 function InstallSpglib() {
   wget https://winmostar.com/wm/cygwin_wm/packages/spglib-1.15.1.zip
   rm -fr spglib-1.15.1
@@ -312,6 +339,7 @@ function InstallSpglib() {
   cd ../..
 }
 
+# https://github.com/matplotlib/matplotlib/tree/v3.1.0
 function InstallMatplotlib() {
   pip3.7 install wheel || exit 1
 
@@ -323,8 +351,9 @@ function InstallMatplotlib() {
   cd ..
 }
 
+# https://github.com/pandas-dev/pandas/tree/v1.0.3
 function InstallPandas() {
-    wget https://winmostar.com/wm/cygwin_wm/packages/pandas-1.0.3.zip
+  wget https://winmostar.com/wm/cygwin_wm/packages/pandas-1.0.3.zip
   rm -fr pandas-1.0.3
   unzip pandas-1.0.3.zip
   cd pandas-1.0.3
@@ -332,6 +361,7 @@ function InstallPandas() {
   cd ..
 }
 
+# https://github.com/materialsproject/pymatgen/tree/v2020.4.29
 function InstallPymatgen() {
   pip3.7 install ase || exit 1
 
@@ -343,6 +373,7 @@ function InstallPymatgen() {
   cd ..
 }
 
+# https://lammps.sandia.gov/tars/
 function InstallLammps() {
   rm -rf /usr/local/lammps-30Jul16
   wget https://winmostar.com/wm/cygwin_wm/packages/lammps-30Jul16.tar.gz

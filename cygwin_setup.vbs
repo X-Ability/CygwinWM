@@ -14,8 +14,8 @@ If CLEAN_INSTALL And objFso.FolderExists("C:\cygwin_wm") Then
     WScript.Quit
 End If
 
-
-''' Install Cygwin '''
+' Install Cygwin
+' https://www.cygwin.com/
 cmd = ".\setup-x86.exe " &_
   "--site http://cygwin.mirror.constant.com " &_
   "--no-shortcuts  " &_
