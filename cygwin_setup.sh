@@ -285,28 +285,34 @@ function InstallMktop() {
 }
 
 # If setup.py returns an error, launch C:\cygwin_wm\bin\ash.exe and execute "cd /bin" and "./rebaseall".
-function InstallPymatgen() {
+function InstallCython() {
   wget https://winmostar.com/wm/cygwin_wm/packages/cython-0.29.13.zip
   rm -fr cython-0.29.13
   unzip cython-0.29.13.zip
   cd cython-0.29.13
   python3.7 setup.py install || exit 1
   cd ..
-  
+}
+
+function InstallScypy() {
   wget https://winmostar.com/wm/cygwin_wm/packages/scipy-1.1.0.zip
   rm -fr scipy-1.1.0
   unzip scipy-1.1.0.zip
   cd scipy-1.1.0
   python3.7 setup.py install || exit 1
   cd ..
-  
+}
+
+function InstallSpglib() {
   wget https://winmostar.com/wm/cygwin_wm/packages/spglib-1.15.1.zip
   rm -fr spglib-1.15.1
   unzip spglib-1.15.1.zip
   cd spglib-1.15.1/python
   python3.7 setup.py install || exit 1
   cd ../..
-  
+}
+
+function InstallMatplotlib() {
   pip3.7 install wheel || exit 1
 
   wget https://winmostar.com/wm/cygwin_wm/packages/matplotlib-3.1.0.zip
@@ -315,14 +321,18 @@ function InstallPymatgen() {
   cd matplotlib-3.1.0
   python3.7 setup.py install || exit 1
   cd ..
-  
-  wget https://winmostar.com/wm/cygwin_wm/packages/pandas-1.0.3.zip
+}
+
+function InstallPandas() {
+    wget https://winmostar.com/wm/cygwin_wm/packages/pandas-1.0.3.zip
   rm -fr pandas-1.0.3
   unzip pandas-1.0.3.zip
   cd pandas-1.0.3
   python3.7 setup.py install || exit 1
   cd ..
-  
+}
+
+function InstallPymatgen() {
   pip3.7 install ase || exit 1
 
   wget https://winmostar.com/wm/cygwin_wm/packages/pymatgen-2020.4.29.zip
@@ -429,9 +439,18 @@ InstallConditionalERmod
 InstallEnumlib
 InstallPackmol
 InstallMktop
-InstallPymatgen
 InstallPhonopy
 InstallMDTraj
+
+# for Pymatgen
+InstallCython
+InstallScypy
+InstallSpglib
+InstallMatplotlib
+InstallPandas
+InstallPymatgen
+
+
 #InstallLammps
 
 date
