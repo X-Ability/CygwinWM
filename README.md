@@ -7,7 +7,7 @@ Download and install Cygwin and various packages.
 
 ## Prerequisite
 
-MODYLAS is freeware, but is not allowed to be redistributed.   
+MODYLAS is a freeware, but is not allowed to be redistributed.   
 X-Ability Co. Ltd. has special permission to distribute it as a binary package.  
 If you want to install MODYLAS, download MODYLAS_1.0.4.tar_1.gz manually and put it in src folder.  
 If you don't need to install MODYLAS, comment out the line that calls InstallMODYLAS in cygwin_setup.sh.  
@@ -34,6 +34,7 @@ If you get an error message like this.
 ```bash
 $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.1.6-i686.egg/Cython/Compiler/*.dll
 ```
+3. Restart cygwin_setup.vbs as described above.
 
 ## License
 
@@ -68,5 +69,5 @@ $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.
 
 UIUC : University of Illinois Open Source License
 
-XA-created files in the src folder subject to the same license as the original packages.  
+The files in src folder, which are created by X-Ability, subject to the same license as the original packages.  
 
