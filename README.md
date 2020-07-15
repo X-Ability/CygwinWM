@@ -22,6 +22,19 @@ If the installation script exits abnormally and you want to resume from the midd
 2. Comment out the line that calls an unnecessary installation function in cygwin_setup.sh.
 3. Double click cygwin_setup.vbs again.
 
+If you get an error message like this.
+
+
+>      1 [main] python3.7m 4356 child_info_fork::abort: unable to remap \??\C:\cygwin_wm\lib\python3.7\site-packages\Cython-0.29.13-py3.7-cygwin-3.1.6-i686.egg\Cython\Compiler\FlowControl.cpython-37m-i386-cygwin.dll (using C:\cygwin_wm\lib\python3.7\site-packages\Cython-0.29.13-py3.7-cygwin-3.1.6-i686.egg\Cython\Compiler\FlowControl.cpython-37m-i386-cygwin.dll) to same address as parent (0x1B80000) - try running rebaseall
+
+
+1. Double click C:\cygwin_wm\bin\ash.exe
+2. Execute rebase command like this.
+
+```bash
+$  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.1.6-i686.egg/Cython/Compiler/*.dll
+```
+
 ## License
 
 | Package          | License    | Remarks                          | Reference                                                                        |
