@@ -29,7 +29,6 @@ function InstallOpenBabel() {
   rm -fr openbabel-2.4.1
   rm -f openbabel-2-4-1.obgmxtop.patch
   wget https://winmostar.com/wm/cygwin_wm/packages/openbabel-2.4.1.tar.gz
-  wget https://winmostar.com/wm/cygwin_wm/openbabel-2-4-1.obgmxtop.patch || exit 1
   rm -fr openbabel-2.4.1
   tar xfz openbabel-2.4.1.tar.gz
   patch -u -p1 -d openbabel-2.4.1 < openbabel-2-4-1.obgmxtop.patch
@@ -108,12 +107,12 @@ function InstallAmberTools18() {
 }
 
 function InstallAcpype18() {
-  rm -rf /usr/local/acpype/ ./acpype
-  svn checkout http://svn.code.sf.net/p/ccpn/code/branches/stable/ccpn/python/acpype/ acpype -r 10101
-  wget https://winmostar.com/wm/cygwin_wm/packages/acpype.py 
+  rm -rf /usr/local/acpype/ ./acpype_r10101
+  wget https://winmostar.com/wm/cygwin_wm/packages/acpype_r10101.tgz
+  tar xvfz acpype_r10101.tgz
   chmod a+x acpype.py
-  mv acpype.py acpype/
-  mv acpype /usr/local/
+  mv acpype.py acpype_r10101/
+  mv acpype_r10101 /usr/local/acpype
 }
 
 function InstallERmod() {
@@ -133,8 +132,6 @@ function InstallERmod() {
 
 function InstallMODYLAS() {
   rm -rf /usr/local/MODYLAS_1.0.4
-  wget https://winmostar.com/wm/cygwin_wm/packages/MODYLAS_1.0.4.tar_1.gz
-  wget https://winmostar.com/wm/cygwin_wm/packages/MODYLAS_1.0.4.patch
   rm -fr MODYLAS_1.0.4
   tar xfz MODYLAS_1.0.4.tar_1.gz
   patch -u -p0 < MODYLAS_1.0.4.patch
@@ -197,7 +194,6 @@ function InstallPhonopy() {
 
 function InstallMDTraj() {
   wget https://winmostar.com/wm/cygwin_wm/packages/mdtraj-1.9.0.tar.gz
-  wget https://winmostar.com/wm/cygwin_wm/packages/mdtraj-1.9.0_rev2.patch
   rm -fr mdtraj-1.9.0
   tar xfz mdtraj-1.9.0.tar.gz
   cd mdtraj-1.9.0
@@ -229,14 +225,9 @@ function InstallMATCH() {
 function InstallConditionalERmod() {
   rm -rf /usr/local/ermod_conditional
   wget https://winmostar.com/wm/cygwin_wm/packages/ermod-0.3.5.tar.gz
-  wget https://winmostar.com/wm/cygwin_wm/packages/matsubayashi_20170223.zip
-  wget https://winmostar.com/wm/cygwin_wm/packages/ermod-0.3.5_conditional.patch
   rm -fr ermod-0.3.5
   tar xfz ermod-0.3.5.tar.gz
-  rm -fr matsubayashi_20170223
-  unzip matsubayashi_20170223.zip
-  cp matsubayashi_20170223/*.F90 ermod-0.3.5/
-  patch -u -p0 < ermod-0.3.5_conditional.patch
+  cp -r ermod_conditional/* ermod-0.3.5/
   cd ermod-0.3.5/vmdplugins
   make || exit 1
   cp compile/*.so libexec/
@@ -360,24 +351,6 @@ function InstallLammps() {
   mv lammps-30Jul16 /usr/local/
 }
 
-function InstallQE() {
-  rm -rf /usr/local/lammps-30Jul16
-  wget https://winmostar.com/wm/cygwin_wm/packages/lammps-30Jul16.tar.gz
-  rm -fr lammps-30Jul16
-  tar xf lammps-30Jul16.tar.gz
-  cd lammps-30Jul16/src
-  make yes-misc
-  make yes-rigid
-  make yes-user-reaxc
-  sed -i.bak -e '/^LMP_INC/s/$/ -DLAMMPS_XDR/g' MAKE/Makefile.mpi
-  sed -i.bak -e '/^LMP_INC/s/$/ -DLAMMPS_XDR/g' MAKE/Makefile.serial
-  make serial || exit 1
-  make mpi || exit 1
-  cd ..
-  cd ..
-  mv lammps-30Jul16 /usr/local/
-}
-
 set -x
 
 date
@@ -414,7 +387,8 @@ EOF
 
 cd $SCRIPT_DIR
 cp -f ChangeLog setup-x86.exe /cygdrive/c/cygwin_wm/
-cp -f src/mktop.pl src/parmchk2.c /tmp/
+cp -rf src/* /tmp/
+
 cd /tmp/
 
 if [ ! -f /bin/python3.exe ]; then

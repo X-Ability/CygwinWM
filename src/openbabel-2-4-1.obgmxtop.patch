@@ -1,0 +1,953 @@
+diff -uprN openbabel-2-4-1/include/openbabel/forcefield.h openbabel-2-4-1_saved/include/openbabel/forcefield.h
+--- openbabel-2-4-1/include/openbabel/forcefield.h	2016-10-11 00:56:17.000000000 +0900
++++ openbabel-2-4-1_saved/include/openbabel/forcefield.h	2020-05-01 02:02:40.101885500 +0900
+@@ -540,6 +540,7 @@ namespace OpenBabel
+     bool IsInSameRing(OBAtom* a, OBAtom* b);
+ 
+     // general variables
++    std::string	_molname;
+     OBMol 	_mol; //!< Molecule to be evaluated or minimized
+     bool 	_init; //!< Used to make sure we only parse the parameter file once, when needed
+     std::string	_parFile; //! < parameter file name
+@@ -547,6 +548,8 @@ namespace OpenBabel
+     double	*_gradientPtr; //!< pointer to the gradients (used by AddGradient(), minimization functions, ...)
+     // logging variables
+     std::ostream* _logos; //!< Output for logfile
++    std::ostream* _topos1; //!< Output for topfile (header)
++    std::ostream* _topos2; //!< Output for topfile
+     char 	_logbuf[BUFF_SIZE+1]; //!< Temporary buffer for logfile output
+     int 	_loglvl; //!< Log level for output
+     int 	_origLogLevel;
+@@ -996,6 +999,9 @@ namespace OpenBabel
+      *  }
+      *  \endcode
+      */
++    bool SetTopFile1(std::ostream *pos);
++    bool SetTopFile2(std::ostream *pos);
++
+     bool SetLogLevel(int level);
+     /*! \return The log level.
+      */
+@@ -1020,6 +1026,51 @@ namespace OpenBabel
+ 
+       *_logos << msg;
+     }
++    /*! Print msg to the topfile.
++     *  \param msg The message to print.
++     */
++    void OBFFTop1(std::string msg)
++    {
++      if (!_topos1)
++        return;
++
++      *_topos1 << msg;
++    }
++    /*! Print msg to the topfile.
++     *  \param msg The message to print.
++     */
++    void OBFFTop1(const char *msg)
++    {
++      if (!_topos1)
++        return;
++
++      *_topos1 << msg;
++    }
++    /*! Print msg to the topfile.
++     *  \param msg The message to print.
++     */
++    void OBFFTop2(std::string msg)
++    {
++      if (!_topos2)
++        return;
++
++      *_topos2 << msg;
++    }
++    /*! Print msg to the topfile.
++     *  \param msg The message to print.
++     */
++    void OBFFTop2(const char *msg)
++    {
++      if (!_topos2)
++        return;
++
++      *_topos2 << msg;
++    }
++
++    void SetMolname(const std::string& molname)
++    {
++      _molname = molname;
++    }
+     //@}
+ 
+     /////////////////////////////////////////////////////////////////////////
+diff -uprN openbabel-2-4-1/src/forcefield.cpp openbabel-2-4-1_saved/src/forcefield.cpp
+--- openbabel-2-4-1/src/forcefield.cpp	2016-10-11 00:56:17.000000000 +0900
++++ openbabel-2-4-1_saved/src/forcefield.cpp	2020-05-01 02:02:40.113881900 +0900
+@@ -796,6 +796,26 @@ namespace OpenBabel
+     return true;
+   }
+ 
++  bool OBForceField::SetTopFile1(ostream* pos)
++  {
++    if(pos)
++      _topos1 = pos;
++    else
++      _topos1 = &cout;
++
++    return true;
++  }
++
++  bool OBForceField::SetTopFile2(ostream* pos)
++  {
++    if(pos)
++      _topos2 = pos;
++    else
++      _topos2 = &cout;
++
++    return true;
++  }
++
+   //////////////////////////////////////////////////////////////////////////////////
+   //
+   // General
+diff -uprN openbabel-2-4-1/src/forcefields/forcefielduff.cpp openbabel-2-4-1_saved/src/forcefields/forcefielduff.cpp
+--- openbabel-2-4-1/src/forcefields/forcefielduff.cpp	2016-10-11 00:56:17.000000000 +0900
++++ openbabel-2-4-1_saved/src/forcefields/forcefielduff.cpp	2020-05-01 05:27:09.275758600 +0900
+@@ -79,8 +79,17 @@ namespace OpenBabel {
+       OBFFLog("------------------------------------------------------------------------\n");
+     }
+ 
+-    for (i = _bondcalculations.begin(); i != _bondcalculations.end(); ++i) {
++    if (_bondcalculations.size() > 0){
++      OBFFTop1("\n[ bondtypes ]\n");
++      OBFFTop1("; i j func b0 kb\n");
++
++      OBFFTop2("\n[ bonds ]\n");
++      OBFFTop2("; i j func\n");
++    }
+ 
++    vector<string> registered;
++
++    for (i = _bondcalculations.begin(); i != _bondcalculations.end(); ++i) {
+       i->template Compute<gradients>();
+       energy += i->energy;
+ 
+@@ -95,6 +104,38 @@ namespace OpenBabel {
+                  (*i).bt, (*i).rab, (*i).r0, (*i).kb, (*i).delta, (*i).energy);
+         OBFFLog(_logbuf);
+       }
++
++      const string types = 
++	string((*i).a->GetType()) + "/" +
++	string((*i).b->GetType());
++
++      if (find(registered.begin(), registered.end(), types) == registered.end()){
++	registered.push_back(types);
++
++	const double rij_uff   = (*i).r0;
++	const double kij_uff = (*i).kb * 2.0;
++	const double kb_gmx    = kij_uff * 10.0 * 10.0;
++	const double b0_gmx    = rij_uff * 0.1;
++
++	snprintf(_logbuf, BUFF_SIZE, 
++		 "UFF_%-5s UFF_%-5s %d %20.10f %20.10f; kij(uff)=%20.10f kcal/mol*A^2\n", 
++		 (*i).a->GetType(), 
++		 (*i).b->GetType(), 
++		 1, // harmonic bond in Gromacs
++		 b0_gmx, 
++		 kb_gmx,
++		 kij_uff / KCAL_TO_KJ);
++	OBFFTop1(_logbuf);
++      }
++
++      snprintf(_logbuf, BUFF_SIZE, 
++	       "%10d %10d %d; %-5s %-5s\n", 
++	       (*i).a->GetIdx(), 
++	       (*i).b->GetIdx(), 
++	       1, // harmonic bond in Gromacs
++	       (*i).a->GetType(), 
++	       (*i).b->GetType());
++      OBFFTop2(_logbuf);
+     }
+ 
+     IF_OBFF_LOGLVL_MEDIUM {
+@@ -205,8 +246,21 @@ namespace OpenBabel {
+       OBFFLog("-----------------------------------------------------------------------------\n");
+     }
+ 
+-    for (i = _anglecalculations.begin(); i != _anglecalculations.end(); ++i) {
++    if (_anglecalculations.size() > 0){
++      OBFFTop1("\n[ angletypes ]\n");
++      OBFFTop1("; i j k func th0 cth\n");
++
++      OBFFTop2("\n[ angles ]\n");
++      OBFFTop2("; i j k func\n");
++    }
++
++    const int GMX_ANGLE_HARMONIC = 1;
++    const int GMX_ANGLE_COSINE   = 2;
++    const int GMX_ANGLE_QUARTIC  = 6;
+ 
++    vector<string> registered;
++
++    for (i = _anglecalculations.begin(); i != _anglecalculations.end(); ++i) {
+       i->template Compute<gradients>();
+       energy += i->energy;
+ 
+@@ -221,8 +275,135 @@ namespace OpenBabel {
+                  (*i).c->GetType(), (*i).theta * RAD_TO_DEG, (*i).theta0, (*i).ka, (*i).delta, (*i).energy);
+         OBFFLog(_logbuf);
+       }
++
++      const string types =
++	string((*i).a->GetType()) + "/" +
++	string((*i).b->GetType()) + "/" +
++	string((*i).c->GetType());
++
++      int    coord  = (*i).coord;
++
++	double ka_uff = (*i).ka;
++	double c0_uff = (*i).c0;
++	double c1_uff = (*i).c1;
++	double c2_uff = (*i).c2;
++	double kt_gmx_harm, c0_gmx_quartic, c2_gmx_quartic, c4_gmx_quartic;
++	double theta0_gmx;
++
++	switch (coord) {
++	case 2:
++	  ka_uff = ka_uff * 9.0;
++	  break;
++	case 4:
++	case 6:
++	  ka_uff = ka_uff *16.0;
++	  break;
++	default:
++	  break;
++	}
++
++    int gmx_angle_type;
++//    gmx_angle_type = GMX_ANGLE_HARMONIC;
++//    gmx_angle_type = GMX_ANGLE_COSINE;
++    gmx_angle_type = GMX_ANGLE_QUARTIC;
++
++    c0_gmx_quartic = 0.0;
++    c2_gmx_quartic = 0.0;
++    c4_gmx_quartic = 0.0;
++
++    switch(coord) {
++	case 1:
++	  theta0_gmx = 180.0;
++	  kt_gmx_harm = ka_uff;
++      gmx_angle_type = GMX_ANGLE_HARMONIC; // same as obgmx
++	  c2_gmx_quartic = kt_gmx_harm * 0.5;
++	  break;
++	case 2:
++	  theta0_gmx = 120.0;
++	  kt_gmx_harm = 4.0*ka_uff/3.0;
++	  c2_gmx_quartic = kt_gmx_harm * 0.5;
++	  break;
++	case 4: // square planer
++	case 6: // octahedral
++	  //theta0_gmx = 90.0; // same as obgmx
++	  //kt_gmx_harm = 2.0*ka_uff; // same as obgmx
++    	
++	  theta0_gmx = 180.0 / 4.0 * 3.0;
++	  c0_gmx_quartic = 1.0 / 4.0 * ka_uff * (2.0 - sqrt(2.0));
++	  c2_gmx_quartic = -8.0 / (M_PI * M_PI) * ka_uff * (2.0 - sqrt(2.0));
++	  c4_gmx_quartic = 64.0 / (M_PI * M_PI * M_PI * M_PI) * ka_uff * (2.0 - sqrt(2.0));
++      gmx_angle_type = GMX_ANGLE_QUARTIC;
++	  break;
++	case 7:
++	  double alpha, c7;
++	  alpha = 2.0 * M_PI / 5.0;
++	  c7 = sin(alpha)*(cos(alpha) - cos(2*alpha));
++	  theta0_gmx = 72.0;
++	  kt_gmx_harm = 2.0 * c7*c7 * ka_uff * c1_uff;
++	  c2_gmx_quartic = kt_gmx_harm * 0.5;
++	  break;
++	default:
++	  theta0_gmx = M_PI-acos(c1_uff/(4.0*c2_uff));
++	  theta0_gmx = theta0_gmx * 180.0 / M_PI;
++	  kt_gmx_harm = ka_uff * (16.0*c2_uff*c2_uff - c1_uff*c1_uff) / (4.0* c2_uff);
++	  c2_gmx_quartic = kt_gmx_harm * 0.5;
++	  break;
++	}
++      
++	double kt_gmx_cos;
++	{
++	  double s = sin(theta0_gmx*M_PI/180.0);
++	  kt_gmx_cos = kt_gmx_harm / (s*s);
++	}
++
++    if (find(registered.begin(), registered.end(), types) == registered.end()){
++		registered.push_back(types);
++
++    	if(coord == 7)
++		  cout << "[WARNING] Angle for pentagonal bipyramidal geometry is not currently supported in obgmxtop" << endl;
++    	// Note: This message is searched by Winmostar. Do not edit.
++		
++		if (gmx_angle_type == GMX_ANGLE_QUARTIC){
++			snprintf(_logbuf, BUFF_SIZE, 
++				 "UFF_%-5s UFF_%-5s UFF_%-5s %d  %20.10f %20.10f 0.0 %20.10f 0.0 %20.10f; ka(uff)=%20.10f kcal/mol*rad^2\n", 
++				 (*i).a->GetType(), 
++				 (*i).b->GetType(), 
++				 (*i).c->GetType(),
++				 gmx_angle_type,
++				 theta0_gmx, 
++				 c0_gmx_quartic,
++				 c2_gmx_quartic,
++				 c4_gmx_quartic,
++				 ka_uff / KCAL_TO_KJ);
++				 OBFFTop1(_logbuf);
++		}else{
++			snprintf(_logbuf, BUFF_SIZE, 
++				 "UFF_%-5s UFF_%-5s UFF_%-5s %d %20.10f %20.10f; ka(uff)=%20.10f kcal/mol*rad^2\n", 
++				 (*i).a->GetType(), 
++				 (*i).b->GetType(), 
++				 (*i).c->GetType(),
++				 gmx_angle_type,
++				 theta0_gmx, 
++				 (gmx_angle_type == GMX_ANGLE_HARMONIC) ? 
++				 kt_gmx_harm : kt_gmx_cos,
++				 ka_uff / KCAL_TO_KJ);
++		}
++		OBFFTop1(_logbuf);
+     }
+ 
++      snprintf(_logbuf, BUFF_SIZE, 
++	       "%10d %10d %10d %d; %-5s %-5s %-5s\n", 
++	       (*i).a->GetIdx(), 
++	       (*i).b->GetIdx(), 
++	       (*i).c->GetIdx(),
++	       gmx_angle_type,
++	       (*i).a->GetType(), 
++	       (*i).b->GetType(), 
++	       (*i).c->GetType());
++      OBFFTop2(_logbuf);
++
++    }
++      
+     IF_OBFF_LOGLVL_MEDIUM {
+       snprintf(_logbuf, BUFF_SIZE, "     TOTAL ANGLE BENDING ENERGY = %8.3f %s\n", energy, GetUnit().c_str());
+       OBFFLog(_logbuf);
+@@ -291,8 +472,17 @@ namespace OpenBabel {
+       OBFFLog("----------------------------------------------------------------\n");
+     }
+ 
+-    for (i = _torsioncalculations.begin(); i != _torsioncalculations.end(); ++i) {
++    if (_torsioncalculations.size() > 0){
++      OBFFTop1("\n[ dihedraltypes ]\n");
++      OBFFTop1("; i j k l func phi0 cp mult\n");
++
++      OBFFTop2("\n[ dihedrals ]\n");
++      OBFFTop2("; i j k l func\n");
++    }
++
++    vector<string> registered;
+ 
++    for (i = _torsioncalculations.begin(); i != _torsioncalculations.end(); ++i) {
+       i->template Compute<gradients>();
+       energy += i->energy;
+ 
+@@ -310,6 +500,56 @@ namespace OpenBabel {
+                  (*i).tor * RAD_TO_DEG, (*i).energy);
+         OBFFLog(_logbuf);
+       }
++      
++      const string types = 
++	string((*i).a->GetType()) + "/" +
++	string((*i).b->GetType()) + "/" +
++	string((*i).c->GetType()) + "/" +
++	string((*i).d->GetType());
++
++      if (find(registered.begin(), registered.end(), types) == registered.end()){
++	registered.push_back(types);
++
++	double vphi_uff = (*i).V * 2.0;
++	double phi0_uff = (*i).phi0; // degree
++	int    n_uff    = (*i).n;
++
++	double nphi0 = n_uff * phi0_uff;
++	if(fabs(sin(nphi0*M_PI/180.0)) > 1.0e-3)
++	  cout << "[WARNING] Torsion with nphi0 = " << nphi0 << " is not currently supported in Winmostar" << endl;
++	// Note: This message is searched by Winmostar. Do not edit.
++
++	double kphi_gmx = vphi_uff * 0.5;
++	double phis_gmx = nphi0 - 180.0;
++
++	snprintf(_logbuf, BUFF_SIZE, 
++		 "UFF_%-5s UFF_%-5s UFF_%-5s UFF_%-5s %d %20.10f %20.10f %d; Vphi(uff)=%20.10f kcal/mol, phi0(uff)=%5.1f degree\n", 
++		 (*i).a->GetType(), 
++		 (*i).b->GetType(), 
++		 (*i).c->GetType(),
++		 (*i).d->GetType(),
++		 1, // proper dihedral
++		 phis_gmx,
++		 kphi_gmx,
++		 n_uff,
++		 vphi_uff / KCAL_TO_KJ,
++		 phi0_uff);
++	OBFFTop1(_logbuf);
++      }
++
++      snprintf(_logbuf, BUFF_SIZE, 
++	       "%10d %10d %10d %10d %d; %-5s %-5s %-5s %-5s\n", 
++	       (*i).a->GetIdx(), 
++	       (*i).b->GetIdx(), 
++	       (*i).c->GetIdx(),
++	       (*i).d->GetIdx(),
++	       1,// proper dihedral
++	       (*i).a->GetType(), 
++	       (*i).b->GetType(), 
++	       (*i).c->GetType(),
++	       (*i).d->GetType());
++      OBFFTop2(_logbuf);
++
+     }
+ 
+     IF_OBFF_LOGLVL_MEDIUM {
+@@ -374,6 +614,16 @@ namespace OpenBabel {
+       OBFFLog("----------------------------------------------------------\n");
+     }
+ 
++    if (_oopcalculations.size() > 0){
++      OBFFTop1("\n[ dihedraltypes ]\n");
++      OBFFTop1("; i j k l func xi0 kxi\n");
++
++      OBFFTop2("\n[ dihedrals ]\n");
++      OBFFTop2("; i j k l func\n");
++    }
++
++    vector<string> registered;
++
+     for (i = _oopcalculations.begin(); i != _oopcalculations.end(); ++i) {
+       i->template Compute<gradients>();
+       energy += i->energy;
+@@ -390,6 +640,58 @@ namespace OpenBabel {
+                  (*i).angle * RAD_TO_DEG, (*i).koop, (*i).energy);
+         OBFFLog(_logbuf);
+       }
++
++      const string types = 
++	string((*i).b->GetType()) + "/" +
++	string((*i).a->GetType()) + "/" +
++	string((*i).c->GetType()) + "/" +
++	string((*i).d->GetType());
++
++      if (find(registered.begin(), registered.end(), types) == registered.end()){
++	registered.push_back(types);
++
++	const double k_uff  = (*i).koop;
++	const double c0_uff = (*i).c0;
++	const double c1_uff = (*i).c1;
++	const double c2_uff = (*i).c2;
++
++	double kxi_gmx, xi0_gmx;
++	
++	if(fabs(c2_uff) < 1.0e-5) {
++	  xi0_gmx = 0.0;
++	  kxi_gmx = k_uff;
++	} else {
++	  double c14c2 = c1_uff / (4.0 * c2_uff);
++	  xi0_gmx = (acos(- c14c2)) / M_PI * 180.0;
++	  kxi_gmx = 4.0 * c2_uff * (1.0 - c14c2 * c14c2) * k_uff;
++	}
++
++	snprintf(_logbuf, BUFF_SIZE, 
++		 "UFF_%-5s UFF_%-5s UFF_%-5s UFF_%-5s %d %20.10f %20.10f; Vphi(uff)=%20.10f kcal/mol\n", 
++		 (*i).b->GetType(), 
++		 (*i).a->GetType(), 
++		 (*i).c->GetType(),
++		 (*i).d->GetType(),
++		 2, // improper dihedral
++		 xi0_gmx,
++		 kxi_gmx,
++		 k_uff / KCAL_TO_KJ);
++	OBFFTop1(_logbuf);
++      }
++
++      snprintf(_logbuf, BUFF_SIZE, 
++	       "%10d %10d %10d %10d %d; %-5s %-5s %-5s %-5s\n", 
++	       (*i).b->GetIdx(), 
++	       (*i).a->GetIdx(), 
++	       (*i).c->GetIdx(),
++	       (*i).d->GetIdx(),
++	       2,// improper dihedral
++	       (*i).b->GetType(), 
++	       (*i).a->GetType(), 
++	       (*i).c->GetType(),
++	       (*i).d->GetType());
++      OBFFTop2(_logbuf);
++
+     }
+ 
+     IF_OBFF_LOGLVL_HIGH {
+@@ -431,7 +733,11 @@ namespace OpenBabel {
+ 
+     // TODO: This actually should include zetas (not always exactly 6-12 for VDW paper)
+ 
+-    term6 = kaSquared / rabSquared; // ^2
++    if (rabSquared == 1.0e-5){
++      term6 = 0.0;
++    }else{
++      term6 = kaSquared / rabSquared; // ^2
++    }
+     term6 = term6 * term6 * term6; // ^6
+     term12 = term6 * term6; // ^12
+ 
+@@ -460,7 +766,21 @@ namespace OpenBabel {
+       //          XX   XX     -000.000  -000.000  -000.000  -000.000
+     }
+ 
++    OBFFTop1("\n[ atomtypes ]\n");
++    OBFFTop1("; name at.num mass charge ptype sigma epsilon\n");
++
++    OBFFTop2("\n[ atoms ]\n");
++    OBFFTop2("; nr type resi res atom cgnr charge mass\n");
++
++    vector<string> registered;
++
+     unsigned int j = 0;
++    unsigned int countelem[120];
++    for (int ii = 0; ii < 120; ii++)
++      countelem[ii] = 0;
++    OpenBabel::OBElementTable *OBet;
++    OBet = new OpenBabel::OBElementTable();
++
+     for (i = _vdwcalculations.begin(); i != _vdwcalculations.end(); ++i, ++j) {
+       // Cut-off check
+       if (_cutoff)
+@@ -475,6 +795,45 @@ namespace OpenBabel {
+         AddGradient((*i).force_b, (*i).idx_b);
+       }
+ 
++      if ((*i).a->GetType() == (*i).b->GetType()){
++
++	countelem[(*i).a->GetAtomicNum()]++;
++
++	const string types = 
++	  string((*i).a->GetType());
++
++	if (find(registered.begin(), registered.end(), types) == registered.end()){
++	  registered.push_back(types);
++
++	  double xij = sqrt((*i).kaSquared);
++	  double Dij = (*i).kab;
++	  double epsilon = Dij;
++	  double sigma   = xij / (pow(2.0, 1.0 / 6.0)) * 0.1;
++
++	  snprintf(_logbuf, BUFF_SIZE, 
++		   "UFF_%-5s %3d 0.0 0.0 A %20.10f %20.10f\n", 
++		   (*i).a->GetType(), 
++		   (*i).a->GetAtomicNum(),
++		   sigma, 
++		   epsilon);
++	  OBFFTop1(_logbuf);
++	}
++
++        snprintf(_logbuf, BUFF_SIZE, 
++		 "%6d UFF_%-5s %d %-5s %2s%-5d %6d CHARGE%6.6d %20.10f\n", 
++		 (*i).a->GetIdx(), 
++		 (*i).a->GetType(), 
++		 1,
++		 _molname.c_str(),
++		 OBet->GetSymbol((*i).a->GetAtomicNum()),
++		 countelem[(*i).a->GetAtomicNum()],
++		 (*i).a->GetIdx(), 
++		 (*i).a->GetIdx(), 
++		 //(*i).a->GetPartialCharge(),
++		 (*i).a->GetAtomicMass());
++        OBFFTop2(_logbuf);
++      }
++
+       IF_OBFF_LOGLVL_HIGH {
+         snprintf(_logbuf, BUFF_SIZE, "%-5s %-5s %8.3f  %8.3f  %8.3f\n", (*i).a->GetType(), (*i).b->GetType(),
+                  (*i).rab, (*i).kab, (*i).energy);
+@@ -845,6 +1204,9 @@ namespace OpenBabel {
+           secondLargestNbr->SetData(label);
+         }
+       }
++      if (SetupVDWCalculation(&*atom, &*atom, vdwcalc)) {
++      	_vdwcalculations.push_back(vdwcalc);
++      }
+     } // end loop through atoms
+ 
+     //
+@@ -1134,7 +1496,7 @@ namespace OpenBabel {
+       OBFFLog("SETTING UP TORSION CALCULATIONS...\n");
+ 
+     double torsiontype;
+-    double phi0 = 0.0;
++    torsioncalc.phi0 = 0.0;
+ 
+     double vi, vj;
+     FOR_TORSIONS_OF_MOL(t, _mol) {
+@@ -1187,7 +1549,7 @@ namespace OpenBabel {
+ 
+       if (parameterB->_ipar[0] == 3 && parameterC->_ipar[0] == 3) {
+         // two sp3 centers
+-        phi0 = 60.0;
++        torsioncalc.phi0 = 60.0;
+         torsioncalc.n = 3;
+         vi = parameterB->_dpar[6];
+         vj = parameterC->_dpar[6];
+@@ -1197,7 +1559,7 @@ namespace OpenBabel {
+         case 8:
+           vi = 2.0;
+           torsioncalc.n = 2;
+-          phi0 = 90.0;
++          torsioncalc.phi0 = 90.0;
+           break;
+         case 16:
+         case 34:
+@@ -1205,13 +1567,13 @@ namespace OpenBabel {
+         case 84:
+           vi = 6.8;
+           torsioncalc.n = 2;
+-          phi0 = 90.0;
++          torsioncalc.phi0 = 90.0;
+         }
+         switch (c->GetAtomicNum()) {
+         case 8:
+           vj = 2.0;
+           torsioncalc.n = 2;
+-          phi0 = 90.0;
++          torsioncalc.phi0 = 90.0;
+           break;
+         case 16:
+         case 34:
+@@ -1219,14 +1581,14 @@ namespace OpenBabel {
+         case 84:
+           vj = 6.8;
+           torsioncalc.n = 2;
+-          phi0 = 90.0;
++          torsioncalc.phi0 = 90.0;
+         }
+ 
+         torsioncalc.V = 0.5 * KCAL_TO_KJ * sqrt(vi * vj);
+ 
+       } else if (parameterB->_ipar[0] == 2 && parameterC->_ipar[0] == 2) {
+         // two sp2 centers
+-        phi0 = 180.0;
++        torsioncalc.phi0 = 180.0;
+         torsioncalc.n = 2;
+         torsioncalc.V = 0.5 * KCAL_TO_KJ * 5.0 *
+           sqrt(parameterB->_dpar[7]*parameterC->_dpar[7]) *
+@@ -1234,7 +1596,7 @@ namespace OpenBabel {
+       } else if ((parameterB->_ipar[0] == 2 && parameterC->_ipar[0] == 3)
+                  || (parameterB->_ipar[0] == 3 && parameterC->_ipar[0] == 2)) {
+         // one sp3, one sp2
+-        phi0 = 0.0;
++        torsioncalc.phi0 = 0.0;
+         torsioncalc.n = 6;
+         torsioncalc.V = 0.5 * KCAL_TO_KJ * 1.0;
+ 
+@@ -1247,7 +1609,7 @@ namespace OpenBabel {
+           case 52:
+           case 84:
+             torsioncalc.n = 2;
+-            phi0 = 90.0;
++            torsioncalc.phi0 = 90.0;
+           }
+         }
+         if (parameterB->_ipar[0] == 3) {
+@@ -1258,7 +1620,7 @@ namespace OpenBabel {
+           case 52:
+           case 84:
+             torsioncalc.n = 2;
+-            phi0 = 90.0;
++            torsioncalc.phi0 = 90.0;
+           }
+         }
+       }
+@@ -1268,7 +1630,7 @@ namespace OpenBabel {
+ 
+       // still need to implement special case of sp2-sp3 with sp2-sp2
+ 
+-      torsioncalc.cosNPhi0 = cos(torsioncalc.n * DEG_TO_RAD * phi0);
++      torsioncalc.cosNPhi0 = cos(torsioncalc.n * DEG_TO_RAD * torsioncalc.phi0);
+       torsioncalc.SetupPointers();
+       _torsioncalculations.push_back(torsioncalc);
+     }
+@@ -1733,17 +2095,17 @@ namespace OpenBabel {
+ 
+     if (gradients) {
+       ClearGradients();
+-      energy  = E_Bond<true>();
++      energy  = E_VDW<true>();
++      energy += E_Bond<true>();
+       energy += E_Angle<true>();
+       energy += E_Torsion<true>();
+       energy += E_OOP<true>();
+-      energy += E_VDW<true>();
+     } else {
+-      energy  = E_Bond<false>();
++      energy  = E_VDW<false>();
++      energy += E_Bond<false>();
+       energy += E_Angle<false>();
+       energy += E_Torsion<false>();
+       energy += E_OOP<false>();
+-      energy += E_VDW<false>();
+     }
+ 
+     // The electrostatic term, by default is 0.0
+diff -uprN openbabel-2-4-1/src/forcefields/forcefielduff.h openbabel-2-4-1_saved/src/forcefields/forcefielduff.h
+--- openbabel-2-4-1/src/forcefields/forcefielduff.h	2016-10-11 00:56:17.000000000 +0900
++++ openbabel-2-4-1_saved/src/forcefields/forcefielduff.h	2020-05-01 02:02:40.136874600 +0900
+@@ -55,7 +55,7 @@ namespace OpenBabel
+     public:
+       int n;
+       double tt; //torsiontype (i.e. b-c bond order)
+-      double V, tor, cosNPhi0;
++      double V, tor, cosNPhi0, phi0;
+ 
+       template<bool> void Compute();
+ 
+@@ -159,6 +159,11 @@ namespace OpenBabel
+     //! \return that analytical gradients are implemented for UFF
+     bool HasAnalyticalGradients() { return true; }
+ 
++    void SetMolname(const std::string& molname)
++    {
++      _molname = molname;
++    }
++
+     //! \return total energy
+     double Energy(bool gradients = true);
+     //! \return the bond stretching energy
+diff -uprN openbabel-2-4-1/tools/CMakeLists.txt openbabel-2-4-1_saved/tools/CMakeLists.txt
+--- openbabel-2-4-1/tools/CMakeLists.txt	2016-10-11 00:56:17.000000000 +0900
++++ openbabel-2-4-1_saved/tools/CMakeLists.txt	2020-05-01 02:02:40.145871700 +0900
+@@ -9,6 +9,7 @@ else(MINIMAL_BUILD)
+         obchiral
+         obconformer
+         obenergy
++        obgmxtop
+         obfit
+         obgen
+         obminimize
+diff -uprN openbabel-2-4-1/tools/obgmxtop.cpp openbabel-2-4-1_saved/tools/obgmxtop.cpp
+--- openbabel-2-4-1/tools/obgmxtop.cpp	1970-01-01 09:00:00.000000000 +0900
++++ openbabel-2-4-1_saved/tools/obgmxtop.cpp	2020-05-01 01:57:22.899720300 +0900
+@@ -0,0 +1,221 @@
++/**********************************************************************
++obgmxtop.cpp - obtain top file for Gromacs
++
++Copyright (C) 2006 Tim Vandermeersch
++
++This file is part of the Open Babel project.
++For more information, see <http://openbabel.org/>
++
++This program is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation version 2 of the License.
++
++This program is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++***********************************************************************/
++
++// used to set import/export for Cygwin DLLs
++#ifdef WIN32
++#define USING_OBDLL
++#endif
++
++#include <openbabel/babelconfig.h>
++#include <openbabel/base.h>
++#include <openbabel/mol.h>
++#include <openbabel/obconversion.h>
++#include <openbabel/forcefield.h>
++#ifndef _MSC_VER
++  #include <unistd.h>
++#endif
++
++using namespace std;
++using namespace OpenBabel;
++
++int main(int argc,char **argv)
++{
++  char *program_name= argv[0];
++  int c;
++  int verbose = 0;
++  bool hydrogens = false;
++  string basename, filename = "", option, option2, ff = "uff", 
++    molname = "RES", outname = "obgmxtop.top";
++  OBConversion conv;
++
++  if (argc < 2) {
++    cout << "Usage: obgmxtop [options] <filename>" << endl;
++    cout << endl;
++    cout << "options:      description:" << endl;
++    cout << endl;
++    cout << "  -v          verbose: print out indivual energy interactions" << endl;
++    cout << endl;
++    cout << "  -h          add hydrogens before calculation" << endl;
++    cout << endl;
++    //    cout << "  -ff ffid    select a forcefield" << endl;
++    //    cout << endl;
++    cout << "  -molname (name of molecule)" << endl;
++    cout << "              specify name of molecule" << endl;
++    cout << endl;
++    exit(-1);
++  } else {
++    int ifile = 1;
++    for (int i = 1; i < argc; i++) {
++      option = argv[i];
++
++      if (option == "-v") {
++        verbose = 1;
++        ifile++;
++        break;
++      }
++
++      if (option == "-h") {
++        hydrogens = true;
++        ifile++;
++      }
++
++      if ((option == "-ff") && (argc > (i+1))) {
++        ff = argv[i+1];
++        ifile += 2;
++      }
++
++      if ((option == "-molname") && (argc > (i+1))) {
++        molname = argv[i+1];
++        ifile += 2;
++      }
++    }
++
++    basename = filename = argv[ifile];
++    size_t extPos = filename.rfind('.');
++
++    if (extPos!= string::npos) {
++      basename = filename.substr(0, extPos);
++    }
++
++
++  }
++
++  // Find Input filetype
++  OBFormat *format_in = conv.FormatFromExt(filename.c_str());
++
++  if (!format_in || !conv.SetInFormat(format_in)) {
++    cerr << program_name << ": cannot read input format!" << endl;
++    exit (-1);
++  }
++
++  ifstream ifs;
++  ofstream ofs;
++
++  // Read the file
++  ifs.open(filename.c_str());
++  if (!ifs) {
++    cerr << program_name << ": cannot read input file!" << endl;
++    exit (-1);
++  }
++
++  OBForceField* pFF = OBForceField::FindForceField(ff);
++  if (!pFF) {
++    cerr << program_name << ": could not find forcefield '" << ff << "'." <<endl;
++    exit (-1);
++  }
++  pFF->SetLogFile(&cout);
++  stringstream sstop1;
++  stringstream sstop2;
++  pFF->SetTopFile1(&sstop1);
++  pFF->SetTopFile2(&sstop2);
++  if (verbose)
++    pFF->SetLogLevel(OBFF_LOGLVL_HIGH);
++  else
++    pFF->SetLogLevel(OBFF_LOGLVL_MEDIUM);
++
++  OBMol mol;
++  double energy;
++  for (c=1;;c++) {
++    mol.Clear();
++    if (!conv.Read(&mol, &ifs))
++      break;
++    if (mol.Empty())
++      break;
++
++    if (hydrogens)
++      mol.AddHydrogens();
++
++    if (!pFF->Setup(mol)) {
++      cerr << program_name << ": could not setup force field." << endl;
++      exit (-1);
++    }
++
++    pFF->SetMolname(molname);
++    energy = pFF->Energy(false);
++    if (!isfinite(energy)) {
++      cerr << " Title: " << mol.GetTitle() << endl;
++      FOR_ATOMS_OF_MOL(atom, mol) {
++        cerr << " x: " << atom->x() << " y: " << atom->y() << " z: " << atom->z() << endl;
++      }
++    }
++  } // end for loop
++
++  ofstream ostop(outname.c_str());
++  ostop << "[ defaults ]\n";
++  ostop << "; nbfunc      comb-rule      gen-pairs       fudgeLJ    fudgeQQ\n";
++  ostop << "1 3 yes 1.0 1.0\n";
++  ostop << sstop1.str();
++  ostop << "\n[ moleculetype ]\n";
++  ostop << "; Name       nrexcl\n";
++  ostop << molname + " 3\n";
++  ostop << sstop2.str();
++
++  cout << "Successfully generated " << outname << endl;
++
++  return(0);
++}
++
++/* obgmxtop man page*/
++/** \page calculate the energy for a molecule
++*
++* \n
++* \par SYNOPSIS
++*
++* \b obgmxtop [options] \<filename\>
++*
++* \par DESCRIPTION
++*
++* The obgmxtop tool can be used to obtain top file for Gromacs
++*
++* \par OPTIONS
++*
++* If no filename is given, obgmxtop will give all options including the
++* available forcefields.
++*
++* \b -v:
++*     Verbose: print out all individual energy interactions \n\n
++* \b -ff \<forcefield\>:
++*     Select the forcefield \n\n
++*
++* \par EXAMPLES
++*  - Obtain top file for test.pdb:
++*   obgmxtop test.pdb
++*
++* \par AUTHORS
++*
++* The obgmxtop program was contributed by \b Ryuji \b Sakamaki.
++*
++* Open Babel is currently maintained by \b Geoff \b Hutchison, \b Chris \b Morley and \b Michael \b Banck.
++*
++* For more contributors to Open Babel, see http://openbabel.org/THANKS.shtml
++*
++* \par COPYRIGHT
++*  Copyright (C) 2007 by Tim Vandermeersch. \n \n
++*  This program is free software; you can redistribute it and/or modify
++*  it under the terms of the GNU General Public License as published by
++*  the Free Software Foundation version 2 of the License.\n \n
++*  This program is distributed in the hope that it will be useful,
++*  but WITHOUT ANY WARRANTY; without even the implied warranty of
++*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++*  GNU General Public License for more details.
++*
++* \par SEE ALSO
++*   The web pages for Open Babel can be found at: http://openbabel.org/ \n
++*   The web pages for Open Babel Molecular Mechanics can be found at:
++*   http://openbabel.org/wiki/Molecular_mechanics \n
++**/

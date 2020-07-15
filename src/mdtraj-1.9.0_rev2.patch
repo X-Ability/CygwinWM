@@ -1,0 +1,68 @@
+diff -uprN mdtraj.orig/rmsd/_lprmsd.pyx mdtraj/rmsd/_lprmsd.pyx
+--- mdtraj.orig/rmsd/_lprmsd.pyx	2020-06-04 23:17:23.751721400 +0900
++++ mdtraj/rmsd/_lprmsd.pyx	2020-06-04 23:16:23.709786100 +0900
+@@ -44,11 +44,14 @@ assert sizeof(np.int32_t) == sizeof(int)
+ cdef extern from "include/fancy_index.hpp":
+     cdef extern void fancy_index2d(const float* A, int nx, int ny,
+         const int* indx, int nindx, const int* indy, int nindy, float* out) nogil
+-cdef extern float msd_atom_major(int nrealatoms, int npaddedatoms,  float* a,
++cdef extern from "include/theobald_rmsd.h": 
++    float msd_atom_major(int nrealatoms, int npaddedatoms,  float* a,
+     float* b, float G_a, float G_b, int computeRot, float rot[9]) nogil
+-cdef extern float rot_atom_major(const int n_atoms, float* a, const float rot[9]) nogil
+-cdef extern void sgemm33(const float A[9], const float B[9], float out[9]) nogil
+-cdef extern void inplace_center_and_trace_atom_major(float* coords, float* traces,
++cdef extern from "include/rotation.h": 
++    float rot_atom_major(const int n_atoms, float* a, const float rot[9]) nogil
++    void sgemm33(const float A[9], const float B[9], float out[9]) nogil
++cdef extern from "include/center.h": 
++    void inplace_center_and_trace_atom_major(float* coords, float* traces,
+     const int n_frames, const int n_atoms) nogil
+ cdef extern from "include/Munkres.h":
+     cdef cppclass Munkres:
+diff -uprN mdtraj.orig/rmsd/_rmsd.pyx mdtraj/rmsd/_rmsd.pyx
+--- mdtraj.orig/rmsd/_rmsd.pyx	2020-06-04 23:17:23.800706200 +0900
++++ mdtraj/rmsd/_rmsd.pyx	2020-06-04 23:16:23.716783400 +0900
+@@ -37,13 +37,15 @@ from cython.parallel cimport prange
+ # External Declarations
+ ##############################################################################
+ 
+-cdef extern float msd_axis_major(int nrealatoms, int npaddedatoms, int rowstride,
++cdef extern from "include/theobald_rmsd.h":
++    float msd_axis_major(int nrealatoms, int npaddedatoms, int rowstride,
+     float* aT, float* bT, float G_a, float G_b) nogil
+-cdef extern float msd_atom_major(int nrealatoms, int npaddedatoms,  float* a,
++    float msd_atom_major(int nrealatoms, int npaddedatoms,  float* a,
+     float* b, float G_a, float G_b, int computeRot, float rot[9]) nogil
+-cdef extern float rot_msd_atom_major(const int n_real_atoms,
++cdef extern from "include/rotation.h": 
++    float rot_msd_atom_major(const int n_real_atoms,
+     const int n_padded_atoms, const float* a, const float* b, const float rot[9]) nogil
+-cdef extern float rot_atom_major(const int n_atoms, float* a, const float rot[9]) nogil
++    float rot_atom_major(const int n_atoms, float* a, const float rot[9]) nogil
+ cdef extern from "center.h":
+     void inplace_center_and_trace_atom_major(float* coords, float* traces,
+     const int n_frames, const int n_atoms) nogil
+diff -uprN mdtraj.orig/rmsd/include/rotation.h mdtraj/rmsd/include/rotation.h
+--- mdtraj.orig/rmsd/include/rotation.h	2020-06-04 23:17:23.791709100 +0900
++++ mdtraj/rmsd/include/rotation.h	2020-06-04 23:16:23.722782100 +0900
+@@ -4,6 +4,7 @@
+ extern "C" {
+ #endif
+ 
++void rot_atom_major(const int n_atoms, float* a, const float rot[9]);
+ float rot_msd_atom_major(const int n_real_atoms, const int n_padded_atoms,
+                          const float* a, const float* b, const float rot[9]);
+ 
+diff -uprN mdtraj.orig/rmsd/src/center.c mdtraj/rmsd/src/center.c
+--- mdtraj.orig/rmsd/src/center.c	2020-06-04 23:17:23.768716400 +0900
++++ mdtraj/rmsd/src/center.c	2020-06-04 23:19:27.124068300 +0900
+@@ -19,7 +19,7 @@ void inplace_center_and_trace_atom_major
+     __m128 x, y, z, x2, y2, z2;
+ 
+     #ifdef _OPENMP
+-    #pragma omp parallel for default(none) shared(coords, traces) \
++    #pragma omp parallel for default(none) shared(coords, traces, n_frames, n_atoms) \
+         private(sx_, sy_, sz_, trace_, mux_, muy_, muz_, sxf, syf, szf, \
+         confp, i, x, y, z, x2, y2, z2, sx, sy, sz, trace)
+     #endif

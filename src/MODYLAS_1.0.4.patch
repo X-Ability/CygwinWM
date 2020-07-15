@@ -1,0 +1,12 @@
+diff -uprN MODYLAS_1.0.4_org/source/src/parse_f.f MODYLAS_1.0.4/source/src/parse_f.f
+--- MODYLAS_1.0.4_org/source/src/parse_f.f	2018-04-10 19:33:03.297690000 +0900
++++ MODYLAS_1.0.4/source/src/parse_f.f	2018-04-10 19:38:19.635492700 +0900
+@@ -360,7 +360,7 @@
+          stop
+       endif
+ 
+- 9000 format('ERROR: the order of atoms is wrong:',i)
++ 9000 format('ERROR: the order of atoms is wrong:',i8)
+ 
+       return
+       end

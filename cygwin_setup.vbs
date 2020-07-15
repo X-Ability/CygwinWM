@@ -10,12 +10,12 @@ strScriptDir  = objFSO.GetParentFolderName(strScriptFile)
 
 
 If CLEAN_INSTALL And objFso.FolderExists("C:\cygwin_wm") Then
-    WScript.Echo "C:\cygwin_wmが存在します"
+    WScript.Echo "C:\cygwin_wm already exists."
     WScript.Quit
 End If
 
 
-''' Cygwinのインストール '''
+''' Install Cygwin '''
 cmd = ".\setup-x86.exe " &_
   "--site http://cygwin.mirror.constant.com " &_
   "--no-shortcuts  " &_
