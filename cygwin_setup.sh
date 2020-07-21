@@ -141,6 +141,7 @@ function InstallERmod() {
 }
 
 # You must agree to the MODYLAS license in order to use MODYLAS.
+# https://www.modylas.org/download
 function InstallMODYLAS() {
   rm -rf /usr/local/MODYLAS_1.0.4
   rm -fr MODYLAS_1.0.4
@@ -470,8 +471,6 @@ InstallConditionalERmod
 InstallEnumlib
 InstallPackmol
 InstallMktop
-InstallPhonopy
-InstallMDTraj
 
 # for Pymatgen
 InstallCython
@@ -481,6 +480,8 @@ InstallMatplotlib
 InstallPandas
 InstallPymatgen
 
+InstallPhonopy
+InstallMDTraj
 
 #InstallLammps
 
