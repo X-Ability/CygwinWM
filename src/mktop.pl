@@ -2898,13 +2898,16 @@ for ($i = 1; $i <= $linha; $i++) {
 
  if ($btype[$i] eq "N") {
   @array = split (/:/, $bond_list[$i]);
-  if($forcefield eq "opls")
-  {
-   $improper[$I]="$array[0] $array[1] $i $array[2] 1   improper_Z_N_X_Y";
-  }
-  if($forcefield eq "amber")
-  {
-   $improper[$I]="$array[0] $array[1] $i $array[2] 4";
+  $length=@array;
+  if($length == 3) {
+   if($forcefield eq "opls")
+   {
+    $improper[$I]="$array[0] $array[1] $i $array[2] 1   improper_Z_N_X_Y";
+   }
+   if($forcefield eq "amber")
+   {
+    $improper[$I]="$array[0] $array[1] $i $array[2] 4";
+   }
   }
   $I++;
  }
