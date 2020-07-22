@@ -1,0 +1,54 @@
+diff -uprN lammps-30Jul16/src/info.cpp lammps-30Jul16_64bit/src/info.cpp
+--- lammps-30Jul16/src/info.cpp	2016-07-28 22:51:40.000000000 +0900
++++ lammps-30Jul16_64bit/src/info.cpp	2020-07-23 01:58:32.148477000 +0900
+@@ -41,7 +41,7 @@
+ #include <time.h>
+ 
+ #ifdef _WIN32
+-#define PSAPI_VERSION=1
++#define PSAPI_VERSION 1
+ #include <windows.h>
+ #include <stdint.h>
+ #include <psapi.h>
+diff -uprN lammps-30Jul16/src/MAKE/Makefile.mpi lammps-30Jul16_64bit/src/MAKE/Makefile.mpi
+--- lammps-30Jul16/src/MAKE/Makefile.mpi	2016-05-12 22:54:17.000000000 +0900
++++ lammps-30Jul16_64bit/src/MAKE/Makefile.mpi	2020-07-23 01:58:32.038292600 +0900
+@@ -6,14 +6,14 @@ SHELL = /bin/sh
+ # compiler/linker settings
+ # specify flags and libraries needed for your compiler
+ 
+-CC =		mpicxx
++CC =		g++
+ CCFLAGS =	-g -O3 
+ SHFLAGS =	-fPIC
+ DEPFLAGS =	-M
+ 
+-LINK =		mpicxx
++LINK =		g++
+ LINKFLAGS =	-g -O
+-LIB = 
++LIB = -lpsapi
+ SIZE =		size
+ 
+ ARCHIVE =	ar
+@@ -28,7 +28,7 @@ SHLIBFLAGS =	-shared
+ # LAMMPS ifdef settings
+ # see possible settings in Section 2.2 (step 4) of manual
+ 
+-LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_MEMALIGN=64
++LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_XDR
+ 
+ # MPI library
+ # see discussion in Section 2.2 (step 5) of manual
+@@ -39,9 +39,9 @@ LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_MEMALIG
+ # PATH = path for MPI library
+ # LIB = name of MPI library
+ 
+-MPI_INC =       -DMPICH_SKIP_MPICXX -DOMPI_SKIP_MPICXX=1
++MPI_INC =       -DMPICH_SKIP_MPICXX -DOMPI_SKIP_MPICXX=1 -I/c/cygwin_wm/tmp/msmpi64
+ MPI_PATH = 
+-MPI_LIB =	
++MPI_LIB = -L/c/cygwin_wm/tmp/msmpi64 -lmsmpi
+ 
+ # FFT library
+ # see discussion in Section 2.2 (step 6) of manual

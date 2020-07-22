@@ -80,3 +80,14 @@ strLogFile = "/cygdrive/" & strShDir & "/cygwin_setup.log"
 cmd = "C:\cygwin_wm\bin\bash.exe --login -c """ & strShFile & " 2>&1 | tee " & strLogFile & """"
 objShell.Run cmd, 1, True
 
+strShFile  = "/" & strShDir & "/mingw32_setup.sh"
+strLogFile = "/" & strShDir & "/mingw32_setup.log"
+
+cmd = "C:\msys64\msys2_shell.cmd -mingw32 -c """ & strShFile & " 2>&1 | tee " & strLogFile & """"
+objShell.Run cmd, 1, True
+
+strShFile  = "/" & strShDir & "/mingw64_setup.sh"
+strLogFile = "/" & strShDir & "/mingw64_setup.log"
+
+cmd = "C:\msys64\msys2_shell.cmd -mingw64 -c """ & strShFile & " 2>&1 | tee " & strLogFile & """"
+objShell.Run cmd, 1, True
