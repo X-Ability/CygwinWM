@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-# Used for LAMMPS and QE
+# Used for MODYLAS, OpenMX and ERmod
 # http://www.mpich.org/static/downloads/1.5/mpich2-1.5.tar.gz
 function InstallMPICH2() {
   rm -rf /usr/local/mpich2-1.5
@@ -374,25 +374,6 @@ function InstallPymatgen() {
   cd ..
 }
 
-# https://lammps.sandia.gov/tars/
-function InstallLammps() {
-  rm -rf /usr/local/lammps-30Jul16
-  wget https://winmostar.com/wm/cygwin_wm/packages/lammps-30Jul16.tar.gz
-  rm -fr lammps-30Jul16
-  tar xf lammps-30Jul16.tar.gz
-  cd lammps-30Jul16/src
-  make yes-misc
-  make yes-rigid
-  make yes-user-reaxc
-  sed -i.bak -e '/^LMP_INC/s/$/ -DLAMMPS_XDR/g' MAKE/Makefile.mpi
-  sed -i.bak -e '/^LMP_INC/s/$/ -DLAMMPS_XDR/g' MAKE/Makefile.serial
-  make serial || exit 1
-  make mpi || exit 1
-  cd ..
-  cd ..
-  mv lammps-30Jul16 /usr/local/
-}
-
 set -x
 
 date
@@ -482,7 +463,5 @@ InstallPymatgen
 
 InstallPhonopy
 InstallMDTraj
-
-#InstallLammps
 
 date
