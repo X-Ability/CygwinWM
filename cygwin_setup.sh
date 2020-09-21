@@ -385,6 +385,13 @@ export LANG=C
 grep "export LANG=C" /etc/profile.d/lang.sh || echo "export LANG=C" >> /etc/profile.d/lang.sh
 
 cat << EOF > /etc/profile.d/winmostar.sh
+# To remove PATH from Windows
+export PATH=\`echo \$PATH | awk -v RS=: '{print \$0}' | \\
+  grep -v "Microsoft MPI" | \\
+  grep -v "MPICH2" | \\
+  grep -v "Quantum ESPRESSO" | \\
+  grep -v "LAMMPS" | \\
+  awk -v ORS=: '{print \$0}'\`
 export PATH=\$PATH:/usr/local/mpich2-1.5/bin
 export PATH=\$PATH:/usr/local/grace/bin
 source /usr/local/gromacs_sse/bin/GMXRC
@@ -401,9 +408,6 @@ export MATCH=/usr/local/MATCH_RELEASE/MATCH
 export PATH=\$PATH:/usr/local/MATCH_RELEASE/MATCH/scripts
 export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
-# To prevent calling native binary of LAMMPS, 
-#   substitute /usr/local/lammps-30Jul16/src before $PATH.
-export PATH=/usr/local/lammps-30Jul16/src:\$PATH
 EOF
 
 . /etc/profile.d/winmostar.sh
