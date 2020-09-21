@@ -38,34 +38,34 @@ $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.
 
 ## License
 
-| Package          | License    | Remarks                          | Reference                                                                        |
-| ---------------- | ---------- | -------------------------------- | -------------------------------------------------------------------------------- |
-| Cygwin           | GPL        |                                  | https://cygwin.com/licensing.html                                                |
-| MPICH            | Original   | BSD like license                 | https://github.com/pmodels/mpich/blob/master/COPYRIGHT                           |
-| Grace            | GPL        |                                  | https://plasma-gate.weizmann.ac.il/Grace/doc/GPL.html                            |
-| OpenBabel        | GPL        |                                  | https://openbabel.org/wiki/Frequently_Asked_Questions                            |
-| Gromacs          | LGPL       |                                  | http://www.gromacs.org/About_Gromacs                                             |
-| AmberTools       | GPL etc.   |                                  | https://ambermd.org/AmberTools.php                                               |
-| Acpype           | GPL        |                                  | https://github.com/alanwilter/acpype/blob/master/LICENSE                         |
-| ERmod            | GPL        |                                  | https://sourceforge.net/projects/ermod/                                          |
-| ERmod(vmdplugin) | UIUC       | based on MIT/X11 and BSD license | https://sourceforge.net/p/ermod/code/ci/default/tree/vmdplugins/LICENSE          |
-| MODYLAS          | Original   |                                  | https://www.modylas.org/node/18                                                  |
-| OpenMX           | GPL        |                                  | http://www.openmx-square.org/whatisopenmx.html                                   |
-| FermiSurfer      | MIT        |                                  | http://www.openmx-square.org/whatisopenmx.html                                   |
-| BoltzTraP        | GPL        |                                  | https://www.imc.tuwien.ac.at/index.php?id=21094                                  |
-| MATCH            | MIT        |                                  | https://brooks.chem.lsa.umich.edu/download/software/match/MATCH_Users_Manual.pdf |
-| enumlib          | MIT        |                                  | https://github.com/msg-byu/enumlib/blob/master/LICENSE                           |
-| symlib           | MIT        |                                  | https://github.com/msg-byu/symlib/blob/master/LICENSE                            |
-| packmol          | MIT        |                                  | https://github.com/m3g/packmol/blob/master/LICENSE                               |
-| MKTOP            | GPL        |                                  | https://github.com/aar2163/MKTOP/blob/master/mktop.pl                            |
-| Pymatgen         | MIT        |                                  | https://pymatgen.org/                                                            |
-| Cython           | Apache     |                                  | https://cython.org/                                                              |
-| ScyPy            | BSD        |                                  | https://www.scipy.org/scipylib/license.html                                      |
-| Spglib           | BSD        |                                  | https://spglib.github.io/spglib/                                                 |
-| matplotlib       | Original   | BSD compatible                   | https://matplotlib.org/3.1.0/users/license.html                                  |
-| pandas           | BSD        |                                  | https://github.com/pandas-dev/pandas/blob/master/LICENSE                         |
-| Phonopy          | BSD        |                                  | https://phonopy.github.io/phonopy/                                               |
-| MDTraj           | LGPL       |                                  | https://fermisurfer.osdn.jp/en/_build/html/copy.html                             |
+| Package          | License    | Remarks                          | Version   | Reference                                                                        |
+| ---------------- | ---------- | -------------------------------- | ----------|--------------------------------------------------------------------------------- |
+| Cygwin           | GPL        |                                  |           | https://cygwin.com/licensing.html                                                |
+| MPICH            | Original   | BSD like license                 | 2-1.5     | https://github.com/pmodels/mpich/blob/master/COPYRIGHT                           |
+| Grace            | GPL        |                                  | 5.1.25    | https://plasma-gate.weizmann.ac.il/Grace/doc/GPL.html                            |
+| OpenBabel        | GPL        |                                  | 2.4.1     | https://openbabel.org/wiki/Frequently_Asked_Questions                            |
+| Gromacs          | LGPL       |                                  | 5.0.7     | http://www.gromacs.org/About_Gromacs                                             |
+| AmberTools       | GPL etc.   |                                  | 18        | https://ambermd.org/AmberTools.php                                               |
+| Acpype           | GPL        |                                  | r10101    | https://github.com/alanwilter/acpype/blob/master/LICENSE                         |
+| ERmod            | GPL        |                                  | 0.3.4     | https://sourceforge.net/projects/ermod/                                          |
+| ERmod(vmdplugin) | UIUC       | based on MIT/X11 and BSD license |           | https://sourceforge.net/p/ermod/code/ci/default/tree/vmdplugins/LICENSE          |
+| MODYLAS          | Original   |                                  | 1.0.4     | https://www.modylas.org/node/18                                                  |
+| OpenMX           | GPL        |                                  | 3.8.4     | http://www.openmx-square.org/whatisopenmx.html                                   |
+| FermiSurfer      | MIT        |                                  | 1.7.1     | http://www.openmx-square.org/whatisopenmx.html                                   |
+| BoltzTraP        | GPL        |                                  | 1.2.5     | https://www.imc.tuwien.ac.at/index.php?id=21094                                  |
+| MATCH            | MIT        |                                  |           | https://brooks.chem.lsa.umich.edu/download/software/match/MATCH_Users_Manual.pdf |
+| enumlib          | MIT        |                                  | 1.0.8     | https://github.com/msg-byu/enumlib/blob/master/LICENSE                           |
+| symlib           | MIT        |                                  | 1.1.0     | https://github.com/msg-byu/symlib/blob/master/LICENSE                            |
+| packmol          | MIT        |                                  | 18.166    | https://github.com/m3g/packmol/blob/master/LICENSE                               |
+| MKTOP            | GPL        |                                  | 2.2.1     | https://github.com/aar2163/MKTOP/blob/master/mktop.pl                            |
+| Pymatgen         | MIT        |                                  | 2020.4.29 | https://pymatgen.org/                                                            |
+| Cython           | Apache     |                                  | 0.29.13   | https://cython.org/                                                              |
+| ScyPy            | BSD        |                                  | 1.1.0     | https://www.scipy.org/scipylib/license.html                                      |
+| Spglib           | BSD        |                                  | 1.15.1    | https://spglib.github.io/spglib/                                                 |
+| matplotlib       | Original   | BSD compatible                   | 3.1.0     | https://matplotlib.org/3.1.0/users/license.html                                  |
+| pandas           | BSD        |                                  | 1.0.3     | https://github.com/pandas-dev/pandas/blob/master/LICENSE                         |
+| Phonopy          | BSD        |                                  | 1.12.6.53 | https://phonopy.github.io/phonopy/                                               |
+| MDTraj           | LGPL       |                                  | 1.9.0     | https://fermisurfer.osdn.jp/en/_build/html/copy.html                             |
 
 UIUC : University of Illinois Open Source License
 
