@@ -20,13 +20,25 @@ function PrepareMSMPI() {
   cd ..
 }
 
+function InstallMSMPI() {
+  DIR_DEST=/c/cygwin_wm/mingw/MicrosoftMPI
+
+  rm -rf ${DIR_DEST}/bin64
+
+  mkdir -p                           ${DIR_DEST}/bin64
+  
+  cp ${DIR_MSMPI}/mpiexec.exe        ${DIR_DEST}/bin64      || exit 1
+#  cp ${DIR_MSMPI}/msmpi.dll          ${DIR_DEST}/bin64      || exit 1
+  cp ${DIR_MSMPI}/smpd.exe           ${DIR_DEST}/bin64      || exit 1
+  cp ${DIR_MSMPI}/MicrosoftMPI-Redistributable-EULA.rtf ${DIR_DEST}/bin64        || exit 1
+}
+
 # https://lammps.sandia.gov/tars/
 function InstallLammps() {
-  DIR_DEST=/c/cygwin_wm/usr/local/lammps-30Jul16_64bit
+  DIR_DEST=/c/cygwin_wm/mingw/lammps-30Jul16
 
-  rm -rf ${DIR_DEST}
+  rm -rf ${DIR_DEST}/bin64
   
-  mkdir -p mingw64
   cd mingw64
 
   wget https://winmostar.com/wm/cygwin_wm/packages/lammps-30Jul16.tar.gz
@@ -43,25 +55,25 @@ function InstallLammps() {
   make yes-user-reaxc
 #    NOTE: Do not use "|| exit 1" after "make" because this returns an error code
 #      even though it is working properly.
+  make serial
   make mpi
   cd ..
   
-  mkdir -p                           ${DIR_DEST}/bin
+  mkdir -p                           ${DIR_DEST}/bin64
   mkdir -p                           ${DIR_DEST}/Doc
   mkdir -p                           ${DIR_DEST}/Potentials
   mkdir -p                           ${DIR_DEST}/Benchmarks
 
-  cp src/lmp_mpi.exe                 ${DIR_DEST}/bin/        || exit 1
+  cp src/lmp_serial.exe              ${DIR_DEST}/bin64/      || exit 1
+  cp src/lmp_mpi.exe                 ${DIR_DEST}/bin64/      || exit 1
   cp LICENSE                         ${DIR_DEST}/            || exit 1
   cp potentials/*                    ${DIR_DEST}/Potentials/ || exit 1
   cp bench/in.*                      ${DIR_DEST}/Benchmarks/ || exit 1
   cp doc/Manual.pdf                  ${DIR_DEST}/Doc/        || exit 1
 
-  cp /mingw64/bin/libstdc++-6.dll    ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/mpiexec.exe        ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/msmpi.dll          ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/smpd.exe           ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/MicrosoftMPI-Redistributable-EULA.rtf ${DIR_DEST}/bin/        || exit 1
+  cp /mingw64/bin/libstdc++-6.dll    ${DIR_DEST}/bin64/      || exit 1
+
+  cp ${DIR_MSMPI}/msmpi.dll          ${DIR_DEST}/bin64/      || exit 1
   
   cd ..
   
@@ -69,11 +81,10 @@ function InstallLammps() {
 }
 
 function InstallQE() {
-  DIR_DEST=/c/cygwin_wm/usr/local/q-e-qe-6.4.1_64bit
+  DIR_DEST=/c/cygwin_wm/mingw/q-e-qe-6.4.1
 
   rm -rf ${DIR_DEST}
   
-  mkdir -p mingw64
   cd mingw64
 
   wget https://gitlab.com/QEF/q-e/-/archive/qe-6.4.1/q-e-qe-6.4.1.tar.gz
@@ -92,29 +103,27 @@ function InstallQE() {
   for f in *.x; do mv $f ${f%x}exe; done
   cd ..
   
-  mkdir -p                            ${DIR_DEST}/bin
+  mkdir -p                            ${DIR_DEST}/bin64
   mkdir -p                            ${DIR_DEST}/doc
   mkdir -p                            ${DIR_DEST}/pseudo
   
-  cp bin/*                            ${DIR_DEST}/bin/        || exit 1
-  cp License                          ${DIR_DEST}/            || exit 1
-  cp Doc/*.pdf                        ${DIR_DEST}/doc/        || exit 1
-  cp PW/Doc/*.pdf                     ${DIR_DEST}/doc/        || exit 1
-  cp PW/Doc/*.html                    ${DIR_DEST}/doc/        || exit 1
+  cp bin/*                            ${DIR_DEST}/bin64/ || exit 1
+  cp License                          ${DIR_DEST}/       || exit 1
+  cp Doc/*.pdf                        ${DIR_DEST}/doc/   || exit 1
+  cp PW/Doc/*.pdf                     ${DIR_DEST}/doc/   || exit 1
+  cp PW/Doc/*.html                    ${DIR_DEST}/doc/   || exit 1
 
-  cp /c/Windows/System32/ws2_32.dll   ${DIR_DEST}/bin/ || exit 1
-  cp /c/Windows/System32/msmpi.dll    ${DIR_DEST}/bin/ || exit 1
-  cp /mingw64/bin/libgcc_s_seh-1.dll  ${DIR_DEST}/bin/ || exit 1
-  cp /mingw64/bin/libgfortran-5.dll   ${DIR_DEST}/bin/ || exit 1
-  cp /mingw64/bin/libquadmath-0.dll   ${DIR_DEST}/bin/ || exit 1
-  cp /mingw64/bin/libwinpthread-1.dll ${DIR_DEST}/bin/ || exit 1
-  cp /mingw64/bin/libgomp-1.dll       ${DIR_DEST}/bin/ || exit 1
-  cp /c/Program\ Files\ \(x86\)/IntelSWTools/compilers_and_libraries/windows/redist/intel64_win/mkl/*.dll               ${DIR_DEST}/bin/ || exit 1
-  cp /c/Program\ Files\ \(x86\)/IntelSWTools/compilers_and_libraries/windows/redist/intel64_win/compiler/libiomp5md.dll ${DIR_DEST}/bin/ || exit 1
-  cp ${DIR_MSMPI}/mpiexec.exe        ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/msmpi.dll          ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/smpd.exe           ${DIR_DEST}/bin/        || exit 1
-  cp ${DIR_MSMPI}/MicrosoftMPI-Redistributable-EULA.rtf ${DIR_DEST}/bin/        || exit 1
+  cp /c/Windows/System32/ws2_32.dll   ${DIR_DEST}/bin64/ || exit 1
+  cp /c/Windows/System32/msmpi.dll    ${DIR_DEST}/bin64/ || exit 1
+  cp /mingw64/bin/libgcc_s_seh-1.dll  ${DIR_DEST}/bin64/ || exit 1
+  cp /mingw64/bin/libgfortran-5.dll   ${DIR_DEST}/bin64/ || exit 1
+  cp /mingw64/bin/libquadmath-0.dll   ${DIR_DEST}/bin64/ || exit 1
+  cp /mingw64/bin/libwinpthread-1.dll ${DIR_DEST}/bin64/ || exit 1
+  cp /mingw64/bin/libgomp-1.dll       ${DIR_DEST}/bin64/ || exit 1
+  cp /c/Program\ Files\ \(x86\)/IntelSWTools/compilers_and_libraries/windows/redist/intel64_win/mkl/*.dll               ${DIR_DEST}/bin64/ || exit 1
+  cp /c/Program\ Files\ \(x86\)/IntelSWTools/compilers_and_libraries/windows/redist/intel64_win/compiler/libiomp5md.dll ${DIR_DEST}/bin64/ || exit 1
+
+  cp ${DIR_MSMPI}/msmpi.dll          ${DIR_DEST}/bin64/  || exit 1
 
   cd ..
   
@@ -129,8 +138,11 @@ export LANG=C
 
 cd /c/cygwin_wm/tmp
 
+mkdir -p mingw64
+
 #PrepareMSMPI
 
+#InstallMSMPI
 InstallLammps
 InstallQE
 

@@ -54,3 +54,44 @@ diff -uprN lammps-30Jul16/src/MAKE/Makefile.mpi lammps-30Jul16_32bit/src/MAKE/Ma
  
  # FFT library
  # see discussion in Section 2.2 (step 6) of manual
+diff -uprN lammps-30Jul16/src/MAKE/Makefile.serial lammps-30Jul16_32bit/src/MAKE/Makefile.serial
+--- lammps-30Jul16/src/MAKE/Makefile.serial	2020-09-20 23:35:42.020475500 +0900
++++ lammps-30Jul16_32bit/src/MAKE/Makefile.serial	2020-09-20 23:45:13.292194400 +0900
+@@ -7,13 +7,13 @@ SHELL = /bin/sh
+ # specify flags and libraries needed for your compiler
+ 
+ CC =		g++
+-CCFLAGS =	-g -O3
++CCFLAGS =	-g -O3 -fpermissive
+ SHFLAGS =	-fPIC
+ DEPFLAGS =	-M
+ 
+ LINK =		g++
+-LINKFLAGS =	-g -O
+-LIB = 
++LINKFLAGS =	-g -O -Wl,--add-stdcall-alias
++LIB = -lpsapi
+ SIZE =		size
+ 
+ ARCHIVE =	ar
+@@ -28,7 +28,7 @@ SHLIBFLAGS =	-shared
+ # LAMMPS ifdef settings
+ # see possible settings in Section 2.2 (step 4) of manual
+ 
+-LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_MEMALIGN=64
++LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_XDR
+ 
+ # MPI library
+ # see discussion in Section 2.2 (step 5) of manual
+@@ -39,9 +39,9 @@ LMP_INC =	-DLAMMPS_GZIP -DLAMMPS_MEMALIG
+ # PATH = path for MPI library
+ # LIB = name of MPI library
+ 
+-MPI_INC =       -I../STUBS 
++MPI_INC =       -I../STUBS  -I/c/cygwin_wm/tmp/msmpi32
+ MPI_PATH =      -L../STUBS
+-MPI_LIB =	-lmpi_stubs
++MPI_LIB =	-lmpi_stubs -L/c/cygwin_wm/tmp/msmpi32 -lmsmpi
+ 
+ # FFT library
+ # see discussion in Section 2.2 (step 6) of manual
