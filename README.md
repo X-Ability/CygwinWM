@@ -51,7 +51,7 @@ $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.
 | ERmod(vmdplugin) | UIUC       | based on MIT/X11 and BSD license |           | https://sourceforge.net/p/ermod/code/ci/default/tree/vmdplugins/LICENSE          |
 | MODYLAS          | Original   |                                  | 1.0.4     | https://www.modylas.org/node/18                                                  |
 | OpenMX           | GPL        |                                  | 3.8.4     | http://www.openmx-square.org/whatisopenmx.html                                   |
-| FermiSurfer      | MIT        |                                  | 1.7.1     | http://www.openmx-square.org/whatisopenmx.html                                   |
+| FermiSurfer      | MIT        |                                  | 1.7.1     | https://fermisurfer.osdn.jp/en/_build/html/copy.html                             |
 | BoltzTraP        | GPL        |                                  | 1.2.5     | https://www.imc.tuwien.ac.at/index.php?id=21094                                  |
 | MATCH            | MIT        |                                  |           | https://brooks.chem.lsa.umich.edu/download/software/match/MATCH_Users_Manual.pdf |
 | enumlib          | MIT        |                                  | 1.0.8     | https://github.com/msg-byu/enumlib/blob/master/LICENSE                           |
@@ -65,7 +65,8 @@ $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.
 | matplotlib       | Original   | BSD compatible                   | 3.1.0     | https://matplotlib.org/3.1.0/users/license.html                                  |
 | pandas           | BSD        |                                  | 1.0.3     | https://github.com/pandas-dev/pandas/blob/master/LICENSE                         |
 | Phonopy          | BSD        |                                  | 1.12.6.53 | https://phonopy.github.io/phonopy/                                               |
-| MDTraj           | LGPL       |                                  | 1.9.0     | https://fermisurfer.osdn.jp/en/_build/html/copy.html                             |
+| MDTraj           | LGPL       |                                  | 1.9.0     | https://github.com/mdtraj/mdtraj                                                 |
+| ParmEd           | LGPL       |                                  | 3.2.0     | https://github.com/ParmEd/ParmEd                                                 |
 
 UIUC : University of Illinois Open Source License
 
