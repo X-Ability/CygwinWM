@@ -374,6 +374,10 @@ function InstallPymatgen() {
   cd ..
 }
 
+function InstallParmEd() {
+  pip3.7 install parmed || exit 1
+}
+
 set -x
 
 date
@@ -467,5 +471,6 @@ InstallPymatgen
 
 InstallPhonopy
 InstallMDTraj
+InstallParmEd
 
 date
