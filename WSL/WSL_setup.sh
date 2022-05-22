@@ -78,6 +78,33 @@ function InstallMODYLAS() {
   cd ../../..
 }
 
+# https://github.com/mcubeg/packmol/releases
+function InstallPackmol() {
+  rm -rf /usr/local/packmol-18.166
+  wget https://winmostar.com/wm/cygwin_wm/packages/packmol-18.166.zip
+  rm -fr packmol-18.166
+  unzip packmol-18.166.zip
+  cd packmol-18.166
+  ./configure `which gfortran` || exit 1
+  make || exit 1
+  cd ..
+  mv packmol-18.166 /usr/local/
+}
+
+# http://www.aribeiro.net.br/mktop/
+function InstallMktop() {
+  rm -rf /usr/local/mktop_2.2.1
+  wget https://winmostar.com/wm/cygwin_wm/packages/mktop_2.2.1.tar
+  rm -rf mktop_2.2.1
+  mkdir mktop_2.2.1
+  cd mktop_2.2.1
+  tar xvf ../mktop_2.2.1.tar
+  cp mktop_2.2.1.pl mktop.pl
+  chmod 755 mktop.pl
+  cd ..
+  mv mktop_2.2.1 /usr/local/
+}
+
 function InstallNWChem() {
   dir=`pwd`
   cd /tmp/
@@ -190,7 +217,10 @@ export PATH=\$PATH:/usr/local/lammps-30Jul16/src
 export LAMMPS_POTENTIALS=/usr/local/lammps-30Jul16/potentials
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/src
+export PATH=\$PATH:/usr/local/packmol-18.166
+export PATH=\$PATH:/usr/local/mktop_2.2.1
 EOF
+
 
 InstallGromacs
 InstallAmberTools18
@@ -200,5 +230,7 @@ InstallMODYLAS
 InstallNWChem
 InstallLAMMPS
 InstallBoltzTraP
+InstallPackmol
+InstallMktop
 
 #rm -rf /tmp/*
