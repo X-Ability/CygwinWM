@@ -82,12 +82,12 @@ function InstallNWChem() {
   dir=`pwd`
   cd /tmp/
   rm -rf /usr/local/NWChem  Nwchem-6.6.revision27746-src.2015-10-20.tar.gz nwchem-6.6
-  wget http://www.nwchem-sw.org/download.php?f=Nwchem-6.6.revision27746-src.2015-10-20.tar.gz -O Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
+  #wget http://www.nwchem-sw.org/download.php?f=Nwchem-6.6.revision27746-src.2015-10-20.tar.gz -O Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
   wget https://winmostar.com/wm/cygwin_wm/packages/NWChem/Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
   tar xfz Nwchem-6.6.revision27746-src.2015-10-20.tar.gz
   cd nwchem-6.6
 
-  for f in Tddft_mxvec20 Tools_lib64 Config_libs66 Cosmo_meminit Sym_abelian Xccvs98 Dplot_tolrho Driver_smalleig Ga_argv Raman_displ Ga_defs Zgesvd Cosmo_dftprint Txs_gcc6 Gcc6_optfix Util_gnumakefile Util_getppn Gcc6_macs_optfix Notdir_fc Xatom_vdw Hfmke; do wget http://www.nwchem-sw.org/images/${f}.patch.gz; done
+  #for f in Tddft_mxvec20 Tools_lib64 Config_libs66 Cosmo_meminit Sym_abelian Xccvs98 Dplot_tolrho Driver_smalleig Ga_argv Raman_displ Ga_defs Zgesvd Cosmo_dftprint Txs_gcc6 Gcc6_optfix Util_gnumakefile Util_getppn Gcc6_macs_optfix Notdir_fc Xatom_vdw Hfmke; do wget http://www.nwchem-sw.org/images/${f}.patch.gz; done
   for f in Tddft_mxvec20 Tools_lib64 Config_libs66 Cosmo_meminit Sym_abelian Xccvs98 Dplot_tolrho Driver_smalleig Ga_argv Raman_displ Ga_defs Zgesvd Cosmo_dftprint Txs_gcc6 Gcc6_optfix Util_gnumakefile Util_getppn Gcc6_macs_optfix Notdir_fc Xatom_vdw Hfmke; do wget https://winmostar.com/wm/cygwin_wm/packages/NWChem/${f}.patch.gz; done
   for f in *.patch.gz; do gunzip $f; done
   for f in *.patch; do patch -p0 < $f; done
