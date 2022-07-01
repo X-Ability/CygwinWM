@@ -193,7 +193,8 @@ function InstallBoltzTraP() {
 function InstallPymatgen() {
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   bash miniconda.sh -b -p $HOME/miniconda3
-  export PATH=$HOME/miniconda3/bin:$PATH
+  source $HOME/.bash_profile
+  conda install -y python=3.7
   conda install -y --channel conda-forge pymatgen
 }
 
@@ -229,9 +230,25 @@ export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/src
 export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
-export PATH=\$HOME/miniconda3/bin:\$PATH
 EOF
 
+cat << EOF >> $HOME/.bash_profile
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/furukawa/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/furukawa/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/furukawa/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/furukawa/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+EOF
 
 InstallGromacs
 InstallAmberTools18
