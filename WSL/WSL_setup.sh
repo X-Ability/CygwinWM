@@ -17,13 +17,13 @@ function InstallGromacs() {
   mkdir build
   cd build
   cmake .. -DGMX_BUILD_OWN_FFTW=ON -DGMX_GPU=OFF -DGMX_SIMD=AVX_256 -DGMX_DOUBLE=OFF -DGMX_USE_RDTSCP=OFF -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs
-  make -j 4
+  make
   make install
   cd ..
   mkdir build_d
   cd build_d
   cmake .. -DGMX_BUILD_OWN_FFTW=ON -DGMX_GPU=OFF -DGMX_SIMD=AVX_256 -DGMX_DOUBLE=ON -DGMX_USE_RDTSCP=OFF -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs
-  make -j 4
+  make
   make install
   cd ..
 }
@@ -190,6 +190,12 @@ function InstallBoltzTraP() {
   sed -i.bak "s/<policy domain=\"coder\" rights=\"none\" pattern=\"PS\" \/>/<policy domain=\"coder\" rights=\"read|write\" pattern=\"PS\" \/>/g" /etc/ImageMagick-6/policy.xml
 }
 
+function InstallPymatgen() {
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  bash miniconda.sh -b -p $HOME/miniconda3
+  export PATH=$HOME/miniconda3/bin:$PATH
+  conda install -y --channel conda-forge pymatgen
+}
 
 set -x
 
@@ -197,9 +203,13 @@ export LANG=C
 
 cd /tmp/
 
-#apt -y update
-#apt -y upgrade
-apt -y install cmake g++ csh gfortran python2.7 flex zlib1g-dev libbz2-dev subversion python libnetcdf-dev liblapack-dev python-numpy openbabel grace imagemagick gnuplot bc dos2unix libopenmpi-dev python-dev libopenblas-dev openmpi-bin tcsh libfftw3-dev autoconf
+apt -y update
+apt -y upgrade
+apt -y install cmake g++ csh gfortran python2.7 flex zlib1g-dev \
+  libbz2-dev subversion python libnetcdf-dev liblapack-dev python-numpy \
+  openbabel grace imagemagick gnuplot bc dos2unix libopenmpi-dev python-dev \
+  libopenblas-dev openmpi-bin tcsh libfftw3-dev autoconf libboost-dev libxml2-dev
+  python3-dev python3-setuptools python3-pip
 
 cat << EOF > /etc/profile.d/winmostar.sh
 source /usr/local/gromacs/bin/GMXRC
@@ -219,6 +229,7 @@ export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/src
 export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
+export PATH=\$HOME/miniconda3/bin:\$PATH
 EOF
 
 
@@ -232,5 +243,8 @@ InstallLAMMPS
 InstallBoltzTraP
 InstallPackmol
 InstallMktop
+
+# for Pymatgen
+InstallPymatgen
 
 #rm -rf /tmp/*
