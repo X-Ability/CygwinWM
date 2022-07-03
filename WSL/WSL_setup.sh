@@ -192,8 +192,8 @@ function InstallBoltzTraP() {
 
 function InstallPymatgen() {
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  bash miniconda.sh -b -p $HOME/miniconda3
-  source $HOME/.bash_profile
+  bash miniconda.sh -b -p /usr/local/miniconda3
+  source /etc/profile.d/winmostar.sh
   conda install -y python=3.7
   conda install -y --channel conda-forge pymatgen
 }
@@ -204,13 +204,12 @@ export LANG=C
 
 cd /tmp/
 
-apt -y update
-apt -y upgrade
+#apt -y update
+#apt -y upgrade
 apt -y install cmake g++ csh gfortran python2.7 flex zlib1g-dev \
   libbz2-dev subversion python libnetcdf-dev liblapack-dev python-numpy \
   openbabel grace imagemagick gnuplot bc dos2unix libopenmpi-dev python-dev \
   libopenblas-dev openmpi-bin tcsh libfftw3-dev autoconf libboost-dev libxml2-dev
-  python3-dev python3-setuptools python3-pip
 
 cat << EOF > /etc/profile.d/winmostar.sh
 source /usr/local/gromacs/bin/GMXRC
@@ -230,24 +229,21 @@ export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/src
 export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
-EOF
 
-cat << EOF >> $HOME/.bash_profile
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/furukawa/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
+__conda_setup="\$('/usr/local/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ \$? -eq 0 ]; then
+    eval "\$__conda_setup"
 else
-    if [ -f "/home/furukawa/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/furukawa/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/usr/local/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/usr/local/miniconda3/etc/profile.d/conda.sh"
     else
-        export PATH="/home/furukawa/miniconda3/bin:$PATH"
+        export PATH="/usr/local/miniconda3/bin:\$PATH"
     fi
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
 EOF
 
 InstallGromacs
