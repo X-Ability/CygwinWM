@@ -67,7 +67,8 @@ cmd = ".\setup-x86.exe " &_
   "--packages python37-numpy " &_
   "--packages python37-pip " &_
   "--packages python37-yaml " &_
-  "--packages wget "
+  "--packages wget " &_
+  "--packages connect-proxy "
 
 If CLEAN_INSTALL Then
     objShell.Run cmd, 1, True
