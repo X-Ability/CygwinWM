@@ -378,6 +378,32 @@ function InstallParmEd() {
   pip3.7 install parmed || exit 1
 }
 
+# http://towhee.sourceforge.net/
+function InstallTowhee() {
+  rm -rf /usr/local/towhee-8.2.3
+  wget https://sourceforge.net/projects/towhee/files/towhee/towhee-8.2.3.tar.gz --no-check-certificate
+  rm -fr towhee-8.2.3
+  tar zxvf towhee-8.2.3.tar.gz
+  cd towhee-8.2.3
+  
+  mkdir -p /usr/local/towhee-8.2.3
+  ./configure --enable-safe-compare --enable-fix-GNU --prefix=/usr/local/towhee-8.2.3 || exit 1
+  sed -i -e "s/define NTMAX 7/define NTMAX 10/" \
+         -e "s/define NUMAX 2202/define NUMAX 1000/" \
+         -e "s/define TTORMAX 930/define TTORMAX 3000/" \
+         -e "s/define TIMPMAX 120/define TIMPMAX 200/" \
+         -e "s/define NNTYPE 375/define NNTYPE 1000/" \
+         Source/preproc.h || exit 1
+  cd Source
+  make -j4 || exit 1
+  make install || exit 1
+  cd ..
+  
+  cp -r ForceFields /usr/local/towhee-8.2.3/
+  
+  cd ..
+}
+
 set -x
 
 date
@@ -412,6 +438,8 @@ export MATCH=/usr/local/MATCH_RELEASE/MATCH
 export PATH=\$PATH:/usr/local/MATCH_RELEASE/MATCH/scripts
 export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
+export PATH=\$PATH:/usr/local/towhee/bin
+export TOWHEE_FF_PATH=/usr/local/towhee/ForceFields
 EOF
 
 . /etc/profile.d/winmostar.sh
@@ -472,5 +500,6 @@ InstallPymatgen
 InstallPhonopy
 InstallMDTraj
 InstallParmEd
+InstallTowhee
 
 date
