@@ -438,8 +438,8 @@ export MATCH=/usr/local/MATCH_RELEASE/MATCH
 export PATH=\$PATH:/usr/local/MATCH_RELEASE/MATCH/scripts
 export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
-export PATH=\$PATH:/usr/local/towhee/bin
-export TOWHEE_FF_PATH=/usr/local/towhee/ForceFields
+export PATH=\$PATH:/usr/local/towhee-8.2.3/bin
+export TOWHEE_FF_PATH=/usr/local/towhee-8.2.3/ForceFields
 EOF
 
 . /etc/profile.d/winmostar.sh
