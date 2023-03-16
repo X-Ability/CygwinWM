@@ -17,14 +17,13 @@ End If
 
 ' Install Cygwin
 ' https://www.cygwin.com/
-cmd = ".\setup-x86.exe " &_
+cmd = ".\setup-x86_64.exe " &_
   "--site http://cygwin.mirror.constant.com " &_
   "--no-shortcuts  " &_
   "--no-desktop " &_
   "--no-admin " &_
   "--quiet-mode " &_
   "--root C:\cygwin_wm " &_
-  "--arch x86 " &_
   "--local-package-dir C:\cygwin_wm\cygwin-packages " &_
   "--verbose " &_
   "--prune-install " &_
@@ -38,9 +37,6 @@ cmd = ".\setup-x86.exe " &_
   "--packages make " &_
   "--packages pkg-config " &_
   "--packages subversion " &_
-  "--packages gnuplot " &_
-  "--packages ImageMagick " &_
-  "--packages ghostscript " &_
   "--packages m4 " &_
   "--packages libboost-devel " &_
   "--packages libfftw3-devel " &_
@@ -62,13 +58,18 @@ cmd = ".\setup-x86.exe " &_
   "--packages dos2unix " &_
   "--packages patchutils " &_
   "--packages libhdf5-devel " &_
-  "--packages python37 " &_
-  "--packages python37-devel " &_
-  "--packages python37-numpy " &_
-  "--packages python37-pip " &_
-  "--packages python37-yaml " &_
+  "--packages python39 " &_
+  "--packages python39-devel " &_
+  "--packages python39-numpy " &_
+  "--packages python39-pip " &_
+  "--packages python39-yaml " &_
+  "--packages python39-cython " &_
+  "--packages libopenblas " &_
+  "--packages liblapack-devel " &_
   "--packages wget " &_
   "--packages connect-proxy "
+
+
 
 If CLEAN_INSTALL Then
     objShell.Run cmd, 1, True

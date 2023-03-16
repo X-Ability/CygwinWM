@@ -1,29 +1,16 @@
 #!/bin/bash -x
 
-# Used for MODYLAS, OpenMX and ERmod
+# MPICH2 used for MODYLAS, OpenMX and ERmod
 # http://www.mpich.org/static/downloads/1.5/mpich2-1.5.tar.gz
 function InstallMPICH2() {
   rm -rf /usr/local/mpich2-1.5
   wget https://winmostar.com/wm/cygwin_wm/packages/mpich2-1.5.tar.gz
   rm -fr mpich2-1.5
   tar xfz mpich2-1.5.tar.gz
+  patch -u -p1 -d mpich2-1.5 < mpich2-1.5-fno-common.patch
   cd mpich2-1.5
-  ./configure --prefix=/usr/local/mpich2-1.5 || exit 1
+  ./configure --prefix=/usr/local/mpich2-1.5 FFLAGS=-fallow-argument-mismatch || exit 1
   make -j 4 || exit 1
-  make install || exit 1
-  cd ..
-}
-
-# Grace in cygwin has a problem, so install it manually.
-# ftp://plasma-gate.weizmann.ac.il/pub/grace/src/grace5/
-function InstallGrace() {
-  rm -rf /usr/local/grace
-  wget https://winmostar.com/wm/cygwin_wm/packages/grace-5.1.25.tar.gz
-  rm -fr grace-5.1.25
-  tar xfz grace-5.1.25.tar.gz
-  cd grace-5.1.25
-  ./configure || exit 1
-  make || exit 1
   make install || exit 1
   cd ..
 }
@@ -31,7 +18,7 @@ function InstallGrace() {
 # https://github.com/openbabel/openbabel/archive/openbabel-2-4-1.tar.gz
 function InstallOpenBabel() {
   rm -fr openbabel-2.4.1
-  rm -f openbabel-2-4-1.obgmxtop.patch
+  #rm -f openbabel-2-4-1.obgmxtop.patch
   wget https://winmostar.com/wm/cygwin_wm/packages/openbabel-2.4.1.tar.gz
   rm -fr openbabel-2.4.1
   tar xfz openbabel-2.4.1.tar.gz
@@ -106,11 +93,9 @@ function InstallAmberTools18() {
   export AMBERHOME=/usr/local/amber18
   cd $AMBERHOME
   echo y | ./configure -cygwin -noX11 -nosse --skip-python gnu
-  sed -i 's/LDFLAGS=/LDFLAGS=-Wl,--allow-multiple-definition/' AmberTools/src/cpptraj/config.h
-  sed -i 's#${AMBER_PREFIX}/bin:${PATH}#${PATH}:${AMBER_PREFIX}/bin#g' amber.sh
+  patch -u -p1 < $dir/AmberTools18.patch
   source amber.sh || exit 1
-  cp /tmp/parmchk2.c AmberTools/src/antechamber/
-  make install AMBERBUILDFLAGS="-Wl,--allow-multiple-definition -DWITHOUT_BACKTRACE" || exit 1
+  make install AMBERBUILDFLAGS="-Wl,--allow-multiple-definition --allow-argument-mismatch  -DWITHOUT_BACKTRACE" || exit 1
   cd $dir
 }
 
@@ -134,7 +119,7 @@ function InstallERmod() {
   make
   cp compile/*.so libexec/
   cd ..
-  ./configure --prefix=/usr/local/ermod --disable-mpi --enable-openmp --disable-opt || exit 1
+  ./configure --prefix=/usr/local/ermod --disable-mpi --enable-openmp --disable-opt FCFLAGS=--allow-argument-mismatch || exit 1
   make || exit 1
   make install || exit 1
   cd ..
@@ -148,7 +133,7 @@ function InstallMODYLAS() {
   tar xfz MODYLAS_1.0.4.tar_1.gz
   patch -u -p0 < MODYLAS_1.0.4.patch
   cd MODYLAS_1.0.4/source
-  export FCFLAGS="-DMPIPARA -cpp -O3 -DCOMM_CUBE -DFJMPIDIR -DSYNC_COM -DONEPROC_AXIS"
+  export FCFLAGS="-DMPIPARA -cpp -O3 -DCOMM_CUBE -DFJMPIDIR -DSYNC_COM -DONEPROC_AXIS -fallow-argument-mismatch"
   ./configure --with-kind-fortran-compiler=INTEL --prefix=/usr/local/MODYLAS_1.0.4 || exit 1
   cd src
   make || exit 1
@@ -176,9 +161,9 @@ function InstallOpenMX() {
   cd ../..
   patch -u -p0 < openmx3.8.4.patch
   cd openmx3.8/source
-  sed -i.bak -e '/^CC=/s/gcc/mpicc/g' makefile
-  sed -i.bak -e '/^FC=/s/gfortran/mpif90/g' makefile
-  sed -i.bak -e 's|/usr/lib/libmpi_mpifh.dll.a /usr/lib/libmpi.dll.a||g' makefile
+  sed -i.bak -e '/^CC=/s/gcc/mpicc -Wl,--allow-multiple-definition/g' makefile
+  sed -i -e '/^FC=/s/gfortran/mpif90 -fallow-argument-mismatch/g' makefile
+  sed -i -e 's|/usr/lib/libmpi_mpifh.dll.a /usr/lib/libmpi.dll.a||g' makefile
   make || exit 1
   make install || exit 1
   gcc bandgnu13.c -lm -o ../work/bandgnu13.exe || exit 1
@@ -197,26 +182,14 @@ function InstallOpenMX() {
 
 # https://pypi.python.org/pypi/phonopy/1.12.6.53
 function InstallPhonopy() {
-  pip3.7 install pkgconfig || exit 1
-  pip3.7 install h5py || exit 1
-  
-  wget https://winmostar.com/wm/cygwin_wm/packages/phonopy-1.12.6.53.tar.gz
-  rm -fr phonopy-1.12.6.53
-  tar xfz phonopy-1.12.6.53.tar.gz
-  cd phonopy-1.12.6.53
-  python3.7 setup.py install || exit 1
-  cd ..
+  pip3.9 install pkgconfig || exit 1
+  pip3.9 install h5py || exit 1
+  pip3.9 install phonopy || exit 1
 }
 
 # https://github.com/mdtraj/mdtraj/releases/tag/1.9.0
 function InstallMDTraj() {
-  wget https://winmostar.com/wm/cygwin_wm/packages/mdtraj-1.9.0.tar.gz
-  rm -fr mdtraj-1.9.0
-  tar xfz mdtraj-1.9.0.tar.gz
-  cd mdtraj-1.9.0
-  patch -u -p1 -d mdtraj < ../mdtraj-1.9.0_rev2.patch
-  python3.7 setup.py install || exit 1
-  cd ..
+  pip3.9 install mdtraj==1.9.6 || exit 1
 }
 
 # https://www.imc.tuwien.ac.at/forschungsbereich_theoretische_chemie/forschungsgruppen/prof_dr_gkh_madsen_theoretical_materials_chemistry/boltztrap/
@@ -229,7 +202,7 @@ function InstallBoltzTraP() {
   rm BoltzTraP
   sed -i s/:log/log/g x_trans
   # To eliminate the dependence on the machine type
-  make FOPT="-g -funroll-loops -O3 -ffast-math -fgcse-lm -fgcse-sm -ffast-math -ftree-vectorize -fexternal-blas" || exit 1
+  make FOPT="-g -funroll-loops -O3 -ffast-math -fgcse-lm -fgcse-sm -ffast-math -ftree-vectorize -fexternal-blas -fallow-argument-mismatch" || exit 1
   cd ../..
   mv boltztrap-1.2.5/ /usr/local/
 }
@@ -248,12 +221,12 @@ function InstallConditionalERmod() {
   wget https://winmostar.com/wm/cygwin_wm/packages/ermod-0.3.5.tar.gz
   rm -fr ermod-0.3.5
   tar xfz ermod-0.3.5.tar.gz
-  cp -r ermod_conditional/* ermod-0.3.5/
+  cp -r ermod-0.3.5_conditional/* ermod-0.3.5/
   cd ermod-0.3.5/vmdplugins
   make || exit 1
   cp compile/*.so libexec/
   cd ..
-  ./configure --prefix=/usr/local/ermod_conditional --disable-mpi --enable-openmp --disable-opt || exit 1 || exit 1
+  ./configure --prefix=/usr/local/ermod_conditional --disable-mpi --enable-openmp --disable-opt FCFLAGS=--allow-argument-mismatch || exit 1 || exit 1
   make || exit 1
   make install || exit 1
   cd ..
@@ -290,7 +263,6 @@ function InstallPackmol() {
   unzip packmol-18.166.zip
   cd packmol-18.166
   ./configure `which gfortran` || exit 1
-  sed -i -e s/--fast-math/--fast-math\ -m32/g Makefile
   make || exit 1
   cd ..
   mv packmol-18.166 /usr/local/
@@ -310,72 +282,19 @@ function InstallMktop() {
   mv mktop_2.2.1 /usr/local/
 }
 
-# https://github.com/cython/cython/tree/0.29.13
-function InstallCython() {
-  wget https://winmostar.com/wm/cygwin_wm/packages/cython-0.29.13.zip
-  rm -fr cython-0.29.13
-  unzip cython-0.29.13.zip
-  cd cython-0.29.13
-  python3.7 setup.py install || exit 1
-  cd ..
-}
-
-# https://github.com/scipy/scipy/tree/v1.1.0
-function InstallScypy() {
-  wget https://winmostar.com/wm/cygwin_wm/packages/scipy-1.1.0.zip
-  rm -fr scipy-1.1.0
-  unzip scipy-1.1.0.zip
-  cd scipy-1.1.0
-  python3.7 setup.py install || exit 1
-  cd ..
-}
-
-# https://github.com/spglib/spglib/tree/v1.15.1
-function InstallSpglib() {
-  wget https://winmostar.com/wm/cygwin_wm/packages/spglib-1.15.1.zip
-  rm -fr spglib-1.15.1
-  unzip spglib-1.15.1.zip
-  cd spglib-1.15.1/python
-  python3.7 setup.py install || exit 1
-  cd ../..
-}
-
-# https://github.com/matplotlib/matplotlib/tree/v3.1.0
-function InstallMatplotlib() {
-  pip3.7 install wheel || exit 1
-
-  wget https://winmostar.com/wm/cygwin_wm/packages/matplotlib-3.1.0.zip
-  rm -fr matplotlib-3.1.0
-  unzip matplotlib-3.1.0.zip
-  cd matplotlib-3.1.0
-  python3.7 setup.py install || exit 1
-  cd ..
-}
-
-# https://github.com/pandas-dev/pandas/tree/v1.0.3
-function InstallPandas() {
-  wget https://winmostar.com/wm/cygwin_wm/packages/pandas-1.0.3.zip
-  rm -fr pandas-1.0.3
-  unzip pandas-1.0.3.zip
-  cd pandas-1.0.3
-  python3.7 setup.py install || exit 1
-  cd ..
-}
-
 # https://github.com/materialsproject/pymatgen/tree/v2020.4.29
 function InstallPymatgen() {
-  pip3.7 install ase || exit 1
-
-  wget https://winmostar.com/wm/cygwin_wm/packages/pymatgen-2020.4.29.zip
-  rm -fr pymatgen-2020.4.29
-  unzip pymatgen-2020.4.29.zip
-  cd pymatgen-2020.4.29
-  python3.7 setup.py install || exit 1
-  cd ..
+  pip3.9 install pybind11 || exit 1
+  pip3.9 install scipy==1.6.3 || exit 1
+  pip3.9 install spglib || exit 1
+  pip3.9 install matplotlib==3.6.3 || exit 1
+  pip3.9 install pandas || exit 1
+  pip3.9 install ase || exit 1
+  pip3.9 install pymatgen || exit 1
 }
 
 function InstallParmEd() {
-  pip3.7 install parmed || exit 1
+  pip3.9 install parmed || exit 1
 }
 
 # http://towhee.sourceforge.net/
@@ -423,9 +342,9 @@ export PATH=\`echo \$PATH | awk -v RS=: '{print \$0}' | \\
   grep -v "LAMMPS" | \\
   awk -v ORS=: '{print \$0}'\`
 export PATH=\$PATH:/usr/local/mpich2-1.5/bin
-export PATH=\$PATH:/usr/local/grace/bin
 source /usr/local/gromacs_sse/bin/GMXRC
 #source /usr/local/gromacs_avx/bin/GMXRC
+#source /usr/local/amber18/amber.sh
 source /usr/local/amber18/amber.sh
 export PATH=\$PATH:/usr/local/acpype
 export PATH=\$PATH:/usr/local/MODYLAS_1.0.4/bin
@@ -445,13 +364,13 @@ EOF
 . /etc/profile.d/winmostar.sh
 
 cd $SCRIPT_DIR
-cp -f ChangeLog setup-x86.exe /cygdrive/c/cygwin_wm/
+cp -f ChangeLog setup-x86_64.exe /cygdrive/c/cygwin_wm/
 cp -rf src/* /tmp/
 
 cd /tmp/
 
 if [ ! -f /bin/python3.exe ]; then
-  ln -s /bin/python3.7.exe /bin/python3.exe
+  ln -s /bin/python3.9.exe /bin/python3.exe
 fi
 
 if [ ! -f /bin/python2.exe ]; then
@@ -474,7 +393,6 @@ ln -s /cygdrive /mnt
 
 
 InstallMPICH2
-InstallGrace
 InstallOpenBabel
 InstallGromacs
 InstallAmberTools18
@@ -488,15 +406,7 @@ InstallConditionalERmod
 InstallEnumlib
 InstallPackmol
 InstallMktop
-
-# for Pymatgen
-InstallCython
-InstallScypy
-InstallSpglib
-InstallMatplotlib
-InstallPandas
 InstallPymatgen
-
 InstallPhonopy
 InstallMDTraj
 InstallParmEd

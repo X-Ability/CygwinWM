@@ -1,0 +1,246 @@
+diff -uprN amber18_org/AmberTools/src/antechamber/parmchk2.c amber18/AmberTools/src/antechamber/parmchk2.c
+--- amber18_org/AmberTools/src/antechamber/parmchk2.c	2023-03-15 15:30:57.960915500 +0900
++++ amber18/AmberTools/src/antechamber/parmchk2.c	2023-03-15 15:35:50.518040800 +0900
+@@ -1742,7 +1742,7 @@ int bond(char *at_name1, char *at_name2,
+ 
+ void chk_bond(void)
+ {
+-    int i, j, m, n;
++  int i, j, m, n, jj;
+     int suc, suc2;
+     int pid1, pid2;
+     int pid3, pid4;
+@@ -1752,10 +1752,17 @@ void chk_bond(void)
+     double score, score1, score2;
+     fprintf(fpout, "\n%s\n", "BOND");
+ 
++    /*
+     for (i = 0; i < atomnum; i++)
+         for (j = i + 1; j < atomnum; j++)
+             if (atom[i].con[0] == j || atom[i].con[1] == j || atom[i].con[2] == j
+                 || atom[i].con[3] == j || atom[i].con[4] == j || atom[i].con[5] == j) {
++    */
++    for (i = 0; i < atomnum; i++) {
++        for (jj = 0; jj < 6; jj++) {
++            j = atom[i].con[jj];
++            if(j < 0) continue;
++            {
+                 suc = 0;
+                 strcpy(tmpc1, atom[i].ambername);
+                 strcpy(tmpc2, atom[j].ambername);
+@@ -1862,6 +1869,8 @@ void chk_bond(void)
+                     }
+                 }
+             }
++        }
++    }
+ }
+ 
+ int angle(char *at_name1, char *at_name2, char *at_name3, char *corr_name1,
+@@ -1895,7 +1904,7 @@ int angle(char *at_name1, char *at_name2
+ void chk_angle(void)
+ {
+ 
+-    int i, j, k, m, n, o;
++    int i, j, k, m, n, o, jj, kk;
+     int suc, suc2;
+     int pid1, pid2, pid3;
+     int pid4, pid5, pid6;
+@@ -1908,6 +1917,7 @@ void chk_angle(void)
+     fprintf(fpout, "\n%s\n", "ANGLE");
+ 
+     /* NB: non-standard indentation in next four lines; for readability  */
++    /*
+     for (i = 0; i < atomnum; i++) {
+         for (j = 0; j < atomnum; j++) {
+             for (k = 0; k < atomnum; k++) {
+@@ -1918,6 +1928,18 @@ void chk_angle(void)
+                         if (atom[j].con[0] == k || atom[j].con[1] == k
+                             || atom[j].con[2] == k || atom[j].con[3] == k
+                             || atom[j].con[4] == k || atom[j].con[5] == k) {
++    */
++    for (i = 0; i < atomnum; i++) {
++        for (jj = 0; jj < 6; jj++) {
++            j = atom[i].con[jj];
++            if(j < 0) continue;
++            for (kk = 0; kk < 6; kk++) {
++                k = atom[j].con[kk];
++                if(k < 0) continue;
++                if(i == k) continue;
++                {
++                      {
++                            {
+                             suc = 0;
+                             strcpy(tmpc1, atom[i].ambername);
+                             strcpy(tmpc2, atom[j].ambername);
+@@ -2263,6 +2285,7 @@ void chk_torsion(void)
+ {
+ 
+     int i, j, k, l;
++    int jj, kk, ll;
+     int m, n, p, q;
+     int pid1, pid2, pid3, pid4;
+     int pid5, pid6, pid7, pid8;
+@@ -2275,6 +2298,7 @@ void chk_torsion(void)
+     fprintf(fpout, "\n%s\n", "DIHE");
+ 
+     /* NB: non-standard indentation in next four lines; for readability  */
++    /*
+     for (i = 0; i < atomnum; i++) {
+         for (j = 0; j < atomnum; j++) {
+             for (k = 0; k < atomnum; k++) {
+@@ -2289,6 +2313,23 @@ void chk_torsion(void)
+                                 if (atom[l].con[0] == k || atom[l].con[1] == k
+                                     || atom[l].con[2] == k || atom[l].con[3] == k
+                                     || atom[l].con[4] == k || atom[l].con[5] == k) {
++    */
++    for (i = 0; i < atomnum; i++) {
++        for (jj = 0; jj < 6; jj++) {
++            j = atom[i].con[jj];
++            if(j < 0) continue;
++            for (kk = 0; kk < 6; kk++) {
++                k = atom[j].con[kk];
++                if(k < 0) continue;
++                if(i == k) continue;
++                for (ll = 0; ll < 6; ll++) {
++                    l = atom[k].con[ll];
++                    if(l < 0) continue;
++                    if(l == j) continue;
++                    {
++                        {
++                            {
++                                {
+                                     suc = 0;
+                                     strcpy(tmpc1, atom[i].ambername);
+                                     strcpy(tmpc2, atom[j].ambername);
+@@ -3476,7 +3517,6 @@ int main(int argc, char *argv[])
+     torsionparmnum = 0;
+     improperparmnum = 0;
+ 
+-
+     /*read in prep or ac file */
+     atom = (ATOM *) emalloc(sizeof(ATOM) * cinfo.maxatom);
+     bond_array = (BOND *) emalloc(sizeof(BOND) * cinfo.maxbond);
+diff -uprN amber18_org/AmberTools/src/cpptraj/config.h amber18/AmberTools/src/cpptraj/config.h
+--- amber18_org/AmberTools/src/cpptraj/config.h	2023-03-15 15:29:36.660258700 +0900
++++ amber18/AmberTools/src/cpptraj/config.h	2023-03-15 15:34:12.108431300 +0900
+@@ -34,7 +34,7 @@ ARPACK_TARGET=noarpack
+ FFT_TARGET=
+ 
+ CPPTRAJ_LIB= -L/usr/local/amber18/lib64 -larpack -L/usr/local/amber18/lib64 -llapack -L/usr/local/amber18/lib64 -lblas -L/usr/local/amber18/lib64 -lfftw3 -lgfortran
+-LDFLAGS= -L/usr/local/amber18/lib64 -lnetcdf -lbz2 -lz xdrfile/libxdrfile.a   -static -lquadmath
++LDFLAGS=-Wl,--allow-multiple-definition -L/usr/local/amber18/lib64 -lnetcdf -lbz2 -lz xdrfile/libxdrfile.a   -static -lquadmath
+ SFX=
+ EXE=.exe
+ 
+diff -uprN amber18_org/AmberTools/src/sander/sebomd_module.F90 amber18/AmberTools/src/sander/sebomd_module.F90
+--- amber18_org/AmberTools/src/sander/sebomd_module.F90	2023-03-15 15:30:11.660691200 +0900
++++ amber18/AmberTools/src/sander/sebomd_module.F90	2023-03-15 15:36:19.971665700 +0900
+@@ -121,37 +121,6 @@ contains
+     implicit none
+     integer :: stat
+ 
+-    namelist /sebomd/ hamiltonian, &
+-                      modif, &
+-                      ncore, &
+-                      dbuff1, &
+-                      dbuff2, &
+-                      charge_out, &
+-                      bond_order_out, &
+-                      lambda, &
+-                      peptk, &
+-                      method, &
+-                      charge, &
+-                      longrange, &
+-                      fullscf, &
+-                      ntwc, &
+-                      ntwb, &
+-                      chtype, &
+-                      chewald, &
+-                      screen, &
+-                      guess, &
+-                      pdump, &
+-                      ipolyn, &
+-                      nresidue, &
+-                      ntwh, &
+-                      iprec, &
+-                      peptcorr, &
+-                      debugmsg, &
+-                      debugforces, &
+-                      diag_routine, &
+-                      dpmax, &
+-                      bocut
+-   
+     character(10) :: hamiltonian
+     character(10) :: modif
+     integer :: method
+@@ -183,6 +152,37 @@ contains
+     integer :: debugforces
+     integer :: diag_routine
+ 
++    namelist /sebomd/ hamiltonian, &
++                      modif, &
++                      ncore, &
++                      dbuff1, &
++                      dbuff2, &
++                      charge_out, &
++                      bond_order_out, &
++                      lambda, &
++                      peptk, &
++                      method, &
++                      charge, &
++                      longrange, &
++                      fullscf, &
++                      ntwc, &
++                      ntwb, &
++                      chtype, &
++                      chewald, &
++                      screen, &
++                      guess, &
++                      pdump, &
++                      ipolyn, &
++                      nresidue, &
++                      ntwh, &
++                      iprec, &
++                      peptcorr, &
++                      debugmsg, &
++                      debugforces, &
++                      diag_routine, &
++                      dpmax, &
++                      bocut
++
+     hamiltonian =   sebomd_obj%hamiltonian
+     modif =   sebomd_obj%modif
+     method =   sebomd_obj%method
+diff -uprN amber18_org/amber.sh amber18/amber.sh
+--- amber18_org/amber.sh	2023-03-15 15:33:17.002214300 +0900
++++ amber18/amber.sh	2023-03-15 15:34:45.469386100 +0900
+@@ -1,6 +1,6 @@
+ export AMBER_PREFIX="/usr/local/amber18"
+ export AMBERHOME=/usr/local/amber18
+-export PATH="${AMBER_PREFIX}/bin:${PATH}"
++export PATH="${PATH}:${AMBER_PREFIX}/bin"
+ # Add location of Amber Python modules to default Python search path
+ if [ -z "$PYTHONPATH" ]; then
+     export PYTHONPATH="${AMBER_PREFIX}/lib/python/site-packages"
+diff -uprN amber18_org/AmberTools/src/nab/nab.c amber18/AmberTools/src/nab/nab.c
+--- amber18_org/AmberTools/src/nab/nab.c	2023-03-15 15:44:47.395958300 +0900
++++ amber18/AmberTools/src/nab/nab.c	2023-03-15 17:32:10.814435800 +0900
+@@ -231,14 +231,14 @@ char	nfmask[];
+ 	}
+ 	if( !copt ){
+ 		sprintf( word, " -L%s/lib -lnab -lcifparse", amberhome );
+-		if (strlen(cmd) + strlen(word) + strlen(FLIBS) + 7 > cmd_sz) {
+-		    cmd_sz += strlen(word) + strlen(FLIBS) + 7;
++		if (strlen(cmd) + strlen(word) + strlen(FLIBS) + 7 + 32 > cmd_sz) {
++		    cmd_sz += strlen(word) + strlen(FLIBS) + 7 + 32;
+ 		    cmd = realloc(cmd, cmd_sz);
+ 		}
+ 		strcat( cmd, word );
+ 		sprintf( word, " %s ", FLIBS );
+ 		strcat( cmd, word );
+-		strcat( cmd, " -lm" );
++		strcat( cmd, " -lm -Wl,--allow-multiple-definition" );
+ 	}
+ 	if( cgdopt ) fprintf( stderr, "cc cmd: %s\n", cmd );
+ 	status = system( cmd ); 
