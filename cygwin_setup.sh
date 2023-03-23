@@ -156,14 +156,9 @@ function InstallOpenMX() {
   tar xvfz openmx3.8.tar.gz
   cd openmx3.8/source
   tar xvfz ../../patch3.8.4.tar.gz
-  touch TRAN_Main_Analysis.c
-  touch TRAN_Main_Analysis_NC.c
   cd ../..
   patch -u -p0 < openmx3.8.4.patch
   cd openmx3.8/source
-  sed -i.bak -e '/^CC=/s/gcc/mpicc -Wl,--allow-multiple-definition/g' makefile
-  sed -i -e '/^FC=/s/gfortran/mpif90 -fallow-argument-mismatch/g' makefile
-  sed -i -e 's|/usr/lib/libmpi_mpifh.dll.a /usr/lib/libmpi.dll.a||g' makefile
   make || exit 1
   make install || exit 1
   gcc bandgnu13.c -lm -o ../work/bandgnu13.exe || exit 1

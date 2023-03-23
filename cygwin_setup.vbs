@@ -37,6 +37,9 @@ cmd = ".\setup-x86_64.exe " &_
   "--packages make " &_
   "--packages pkg-config " &_
   "--packages subversion " &_
+  "--packages gnuplot " &_
+  "--packages ImageMagick " &_
+  "--packages ghostscript " &_
   "--packages m4 " &_
   "--packages libboost-devel " &_
   "--packages libfftw3-devel " &_
