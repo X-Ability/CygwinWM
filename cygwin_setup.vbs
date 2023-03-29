@@ -63,10 +63,7 @@ cmd = ".\setup-x86_64.exe " &_
   "--packages libhdf5-devel " &_
   "--packages python39 " &_
   "--packages python39-devel " &_
-  "--packages python39-numpy " &_
   "--packages python39-pip " &_
-  "--packages python39-yaml " &_
-  "--packages python39-cython " &_
   "--packages libopenblas " &_
   "--packages liblapack-devel " &_
   "--packages wget " &_

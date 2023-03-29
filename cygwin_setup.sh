@@ -179,11 +179,13 @@ function InstallOpenMX() {
 function InstallPhonopy() {
   pip3.9 install pkgconfig || exit 1
   pip3.9 install h5py || exit 1
+  pip3.9 install matplotlib==3.6.3 || exit 1
   pip3.9 install phonopy || exit 1
 }
 
 # https://github.com/mdtraj/mdtraj/releases/tag/1.9.0
 function InstallMDTraj() {
+  pip3.9 install scipy==1.6.3 || exit 1
   pip3.9 install mdtraj==1.9.6 || exit 1
 }
 
@@ -275,17 +277,6 @@ function InstallMktop() {
   chmod 755 mktop.pl
   cd ..
   mv mktop_2.2.1 /usr/local/
-}
-
-# https://github.com/materialsproject/pymatgen/tree/v2020.4.29
-function InstallPymatgen() {
-  pip3.9 install pybind11 || exit 1
-  pip3.9 install scipy==1.6.3 || exit 1
-  pip3.9 install spglib || exit 1
-  pip3.9 install matplotlib==3.6.3 || exit 1
-  pip3.9 install pandas || exit 1
-  pip3.9 install ase || exit 1
-  pip3.9 install pymatgen || exit 1
 }
 
 function InstallParmEd() {
@@ -401,7 +392,6 @@ InstallConditionalERmod
 InstallEnumlib
 InstallPackmol
 InstallMktop
-InstallPymatgen
 InstallPhonopy
 InstallMDTraj
 InstallParmEd

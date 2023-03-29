@@ -1,6 +1,7 @@
-version 03/20/2023
+version 03/28/2023
 * Changed to Cygwin for 64bit
-* Updated python version from 3.7 to 3.9 and packages for pymatgen
+* Updated python version from 3.7 to 3.9 and packages
+* Changed to use miniconda for pymatgen
 version 07/15/2022
 * Added connect-proxy
 version 03/10/2021
