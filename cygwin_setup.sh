@@ -283,6 +283,10 @@ function InstallParmEd() {
   pip3.9 install parmed || exit 1
 }
 
+function InstallASE() {
+  pip3.9 install ase || exit 1
+}
+
 # http://towhee.sourceforge.net/
 function InstallTowhee() {
   rm -rf /usr/local/towhee-8.2.3
@@ -395,6 +399,7 @@ InstallMktop
 InstallPhonopy
 InstallMDTraj
 InstallParmEd
+InstallASE
 InstallTowhee
 
 date
