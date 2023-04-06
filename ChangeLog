@@ -1,4 +1,4 @@
-version 04/01/2023
+version 04/05/2023
 * Changed to Cygwin for 64bit
 * Updated python version from 3.7 to 3.9 and packages
 * Changed to use miniconda for pymatgen
