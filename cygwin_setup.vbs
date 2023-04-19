@@ -67,6 +67,7 @@ cmd = ".\setup-x86_64.exe " &_
   "--packages libopenblas " &_
   "--packages liblapack-devel " &_
   "--packages wget " &_
+  "--packages zip " &_
   "--packages connect-proxy "
 
 
