@@ -1,3 +1,5 @@
+version 04/23/2023
+* Added an MS-MPI dll for LAMMPS 
 version 04/19/2023
 * Added zip
 version 04/05/2023
