@@ -290,7 +290,7 @@ function InstallASE() {
 # http://towhee.sourceforge.net/
 function InstallTowhee() {
   rm -rf /usr/local/towhee-8.2.3
-  wget https://sourceforge.net/projects/towhee/files/towhee/towhee-8.2.3.tar.gz --no-check-certificate
+  wget https://winmostar.com/wm/cygwin_wm/packages/towhee-8.2.3.tar.gz
   rm -fr towhee-8.2.3
   tar zxvf towhee-8.2.3.tar.gz
   cd towhee-8.2.3
