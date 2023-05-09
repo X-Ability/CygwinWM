@@ -68,6 +68,7 @@ $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.
 | MDTraj           | LGPL       |                                  | 1.9.0     | https://github.com/mdtraj/mdtraj                                                 |
 | ParmEd           | LGPL       |                                  | 3.2.0     | https://github.com/ParmEd/ParmEd                                                 |
 | Towhee           | GPL        |                                  | 3.2.0     | http://towhee.sourceforge.net/                                                   |
+| Bader            | GPL        |                                  | v1.04     | http://theory.cm.utexas.edu/henkelman/code/bader/                                |
 
 UIUC : University of Illinois Open Source License
 

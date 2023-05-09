@@ -313,6 +313,21 @@ function InstallTowhee() {
   cd ..
 }
 
+# http://theory.cm.utexas.edu/henkelman/code/bader/
+function InstallBader() {
+  rm -rf /usr/local/bader-1.04
+  wget https://winmostar.com/wm/cygwin_wm/packages/bader_v1.04.tar.gz
+  rm -fr bader
+  tar zxvf bader_v1.04.tar.gz
+  cd bader
+  
+  make -f makefile.osx_gfortran || exit 1
+  mkdir -p /usr/local/bader-1.04/bin
+  cp bader.exe /usr/local/bader-1.04/bin/
+  
+  cd ..
+}
+
 set -x
 
 date
@@ -349,6 +364,7 @@ export PATH=\$PATH:/usr/local/packmol-18.166
 export PATH=\$PATH:/usr/local/mktop_2.2.1
 export PATH=\$PATH:/usr/local/towhee-8.2.3/bin
 export TOWHEE_FF_PATH=/usr/local/towhee-8.2.3/ForceFields
+export PATH=\$PATH:/usr/local/bader-1.04/bin
 EOF
 
 . /etc/profile.d/winmostar.sh
@@ -401,5 +417,6 @@ InstallMDTraj
 InstallParmEd
 InstallASE
 InstallTowhee
+InstallBader
 
 date
