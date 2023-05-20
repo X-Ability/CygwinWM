@@ -68,6 +68,7 @@ cmd = ".\setup-x86_64.exe " &_
   "--packages liblapack-devel " &_
   "--packages wget " &_
   "--packages zip " &_
+  "--packages libiconv " &_
   "--packages connect-proxy "
 
 

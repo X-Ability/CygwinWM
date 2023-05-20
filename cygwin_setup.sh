@@ -179,6 +179,7 @@ function InstallOpenMX() {
 function InstallPhonopy() {
   pip3.9 install pkgconfig || exit 1
   pip3.9 install h5py || exit 1
+  pip3.9 install numpy==1.24.3 || exit 1
   pip3.9 install matplotlib==3.6.3 || exit 1
   pip3.9 install phonopy || exit 1
 }
@@ -384,9 +385,8 @@ if [ ! -f /bin/python2.exe ]; then
 fi
 
 # Reqiured to run acpype
-if [ ! -f /bin/python.exe ]; then
-  ln -s /bin/python2.exe /bin/python.exe
-fi
+echo 1 | /usr/sbin/update-alternatives --config python
+
 
 # required to build phonopy
 # https://seesaawiki.jp/w/kou1okada/d/20200205%3A%20Cygwin%20-%20Python3%20-%20h5py
@@ -396,7 +396,6 @@ fi
 
 # os.symlink of python2.7 makes symbolic links to /mnt/ for windows paths
 ln -s /cygdrive /mnt
-
 
 InstallMPICH2
 InstallOpenBabel

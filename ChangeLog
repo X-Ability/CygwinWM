@@ -1,3 +1,7 @@
+version 05/20/2023
+* Modified default python version 
+* Modified packages for phonopy
+* Added Bader
 version 04/23/2023
 * Added an MS-MPI dll for LAMMPS 
 version 04/19/2023
