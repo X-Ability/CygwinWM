@@ -1,3 +1,5 @@
+version 09/17/2023
+* Added a pseudopotential file for Quantum ESPRESSO
 version 08/17/2023
 * Added package MEAM for LAMMPS
 version 05/20/2023
