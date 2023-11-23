@@ -1,0 +1,104 @@
+diff -uprN boltztrap-1.2.5/src/BoltzTraP.F90 boltztrap-1.2.5_rev/src/BoltzTraP.F90
+--- boltztrap-1.2.5/src/BoltzTraP.F90	2013-11-21 00:29:01.000000000 +0900
++++ boltztrap-1.2.5_rev/src/BoltzTraP.F90	2023-11-23 10:26:40.707523200 +0900
+@@ -75,6 +75,8 @@ PROGRAM BoltzTrap
+   integer :: un_phdosxy  = 53
+   integer :: un_phdosxyz = 54
+ 
++  REAL(8), allocatable :: taugre(:,:)
++
+ 
+   WRITE(6,*) '================ BoltzTraP vs 1.2.5 ============='
+   CALL gtfnam(deffn,errfn,iproc)
+@@ -293,9 +295,16 @@ PROGRAM BoltzTrap
+        call dosvv(cell,bs,vv,spinorbit,egap,icut12,icut22,un_dos,un_dosxy,un_dosxyz)
+      else
+        write (6,*) 'Calling DOS'
+-       CALL dos(cell,bs,spinorbit,egap,icut12,icut22,lifetbs%engre,tauinput, &
+-&               un_dos, un_dosxy, un_dosxyz, un_v2dos)
+-
++       if(tauinput) then
++         CALL dos(cell,bs,spinorbit,egap,icut12,icut22,lifetbs%engre,tauinput, &
++&             un_dos, un_dosxy, un_dosxyz, un_v2dos)
++       else
++         allocate(taugre(bs%nwave, bs%icut1:bs%icut2))
++         CALL dos(cell,bs,spinorbit,egap,icut12,icut22,taugre,tauinput, &
++&             un_dos, un_dosxy, un_dosxyz, un_v2dos)
++         deallocate(taugre)
++       endif
++       
+ ! loop over all files of projections
+        do iproj = 1, nproj
+          write (6,*) ' projected DOS - calling DOS for channel ', iproj
+@@ -311,9 +320,17 @@ PROGRAM BoltzTrap
+          ALLOCATE(projbs%engre(projbs%nwave,projbs%icut1:projbs%icut2))
+          CALL fite4(cell, projbs)
+          call out_engre(un_projengre, egap, projbs)
+-         CALL dos(cell,bs,spinorbit,egap,icut12,icut22,lifetbs%engre,tauinput, &
++         if(tauinput) then
++           CALL dos(cell,bs,spinorbit,egap,icut12,icut22,lifetbs%engre,tauinput, &
++&               un_dos, un_dosxy, un_dosxyz, un_v2dos, &
++&               projbs%engre, un_dosproj(iproj))
++       else
++         allocate(taugre(bs%nwave, bs%icut1:bs%icut2))
++         CALL dos(cell,bs,spinorbit,egap,icut12,icut22,taugre,tauinput, &
+ &             un_dos, un_dosxy, un_dosxyz, un_v2dos, &
+ &             projbs%engre, un_dosproj(iproj))
++         deallocate(taugre)
++       endif
+          call destroy_bandstructure (projbs)
+        enddo
+      endif
+@@ -340,8 +357,8 @@ PROGRAM BoltzTrap
+      call boseintegrals(cell, fradix, un_phdos, un_phdosxy, un_phdosxyz)
+   ELSE IF(modus2=='DRAG') THEN
+      write (6,*) 'calling phonon drag routine'
+-     call phonondrag(cell, bs, phonbs, spinorbit, vbm, cbm, fradix, lifetbs%engre,&
+-       &  tauinput, un_dos, un_dosxy, un_dosphdrag)
++     call phonondrag(cell, bs, phonbs, spinorbit, vbm, cbm, fradix, &
++       &  un_dos, un_dosxy, un_dosphdrag)
+   ENDIF
+ 
+   call destroy_bandstructure (bs)
+diff -uprN boltztrap-1.2.5/src/m_interfaces.F90 boltztrap-1.2.5_rev/src/m_interfaces.F90
+--- boltztrap-1.2.5/src/m_interfaces.F90	2013-11-20 23:21:57.000000000 +0900
++++ boltztrap-1.2.5_rev/src/m_interfaces.F90	2023-11-23 10:27:11.350127900 +0900
+@@ -473,7 +473,7 @@ end interface
+ 
+ 
+ interface
+-subroutine phonondrag(cell, bs, phonbs, spinorbit, vbm, cbm, fradix, taugre, tauinput, un, unxy, unphdrag)
++subroutine phonondrag(cell, bs, phonbs, spinorbit, vbm, cbm, fradix, un, unxy, unphdrag)
+ use defs
+ use input
+ use bandstructure
+@@ -484,8 +484,6 @@ type(cell_type), intent(in) :: cell
+ integer, intent(in) :: un, unxy, unphdrag
+ REAL(8),INTENT(IN)      :: vbm,cbm
+ REAL(8),INTENT(IN)      :: spinorbit
+-REAL(8),INTENT(IN)      :: taugre(bs%nwave,bs%icut1:bs%icut2)
+-LOGICAL,INTENT(IN)      :: tauinput
+ character(80), intent(in) :: fradix
+ end subroutine phonondrag
+ end interface
+diff -uprN boltztrap-1.2.5/src/phonondrag.F90 boltztrap-1.2.5_rev/src/phonondrag.F90
+--- boltztrap-1.2.5/src/phonondrag.F90	2013-11-20 23:21:57.000000000 +0900
++++ boltztrap-1.2.5_rev/src/phonondrag.F90	2023-11-23 10:27:27.155146100 +0900
+@@ -9,7 +9,7 @@
+ ! equation 42, with the matrix element P replaced by a constant times N_Q times delta 
+ ! functions for energy and k conservation.
+ !
+-subroutine phonondrag(cell, bs, phonbs, spinorbit, vbm, cbm, fradix, taugre, tauinput, un, unxy, unphdrag)
++subroutine phonondrag(cell, bs, phonbs, spinorbit, vbm, cbm, fradix, un, unxy, unphdrag)
+ 
+ use defs
+ use input
+@@ -25,8 +25,6 @@ type(cell_type), intent(in) :: cell
+ integer, intent(in) :: un, unxy, unphdrag
+ REAL(8),INTENT(IN)      :: vbm,cbm
+ REAL(8),INTENT(IN)      :: spinorbit
+-REAL(8),INTENT(IN)      :: taugre(bs%nwave,bs%icut1:bs%icut2)
+-LOGICAL,INTENT(IN)      :: tauinput
+ character(80), intent(in) :: fradix
+ 
+ 
