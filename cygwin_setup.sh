@@ -196,9 +196,9 @@ function InstallBoltzTraP() {
   wget https://winmostar.com/wm/cygwin_wm/packages/BoltzTraP.tar.bz2
   rm -fr boltztrap-1.2.5
   tar xfj BoltzTraP.tar.bz2
+  patch -u -p0 < boltztrap-1.2.5.patch
   cd boltztrap-1.2.5/src/
   rm BoltzTraP
-  sed -i s/:log/log/g x_trans
   # To eliminate the dependence on the machine type
   make FOPT="-g -funroll-loops -O3 -ffast-math -fgcse-lm -fgcse-sm -ffast-math -ftree-vectorize -fexternal-blas -fallow-argument-mismatch" || exit 1
   cd ../..
