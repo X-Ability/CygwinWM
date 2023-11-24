@@ -1,5 +1,6 @@
 version 12/04/2023
 * Modified BoltzTraP
+* Added package EXTRA-FIX and FEP for LAMMPS
 version 09/17/2023
 * Added a pseudopotential file for Quantum ESPRESSO
 version 08/17/2023
