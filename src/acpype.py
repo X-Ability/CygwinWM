@@ -715,19 +715,19 @@ class AbstractTopol(object):
 #        for i in xrange(0,len(data),f):
 #            fdata += (data[i:i+f])+' '
 
-            for id2 in range(id_, l):
-                item2 = items[id2]
-                c1 = list(map(float, [item[0][i:i + 8] for i in range(0, 24, 8)]))
-                c2 = list(map(float, [item2[0][i:i + 8] for i in range(0, 24, 8)]))
-                dist2 = self.distance(c1, c2)
-                if dist2 < minDist2:
-                    dist = math.sqrt(dist2)
-                    shortd += "%8.5f       %s %s\n" % (dist, item[1], item2[1])
-                if dist2 < maxDist2:  # and not longOK:
-                    longSet.add(str(item[1]))
-                    longSet.add(str(item2[1]))
-            if str(item[1]) not in longSet and l > 1:
-                longd += "%s\n" % item[1]
+#            for id2 in range(id_, l):
+#                item2 = items[id2]
+#                c1 = list(map(float, [item[0][i:i + 8] for i in range(0, 24, 8)]))
+#                c2 = list(map(float, [item2[0][i:i + 8] for i in range(0, 24, 8)]))
+#                dist2 = self.distance(c1, c2)
+#                if dist2 < minDist2:
+#                    dist = math.sqrt(dist2)
+#                    shortd += "%8.5f       %s %s\n" % (dist, item[1], item2[1])
+#                if dist2 < maxDist2:  # and not longOK:
+#                    longSet.add(str(item[1]))
+#                    longSet.add(str(item2[1]))
+#            if str(item[1]) not in longSet and l > 1:
+#                longd += "%s\n" % item[1]
 
         if dups:
             self.printError("Atoms with same coordinates in '%s'!" % self.inputFile)
