@@ -1,6 +1,8 @@
-version 12/04/2023
+version 02/01/2024
+* Optimized Acpype performance
+* Added package EXTRA-FIX, FEP, TALLY and COLVARS for LAMMPS
 * Modified BoltzTraP
-* Added package EXTRA-FIX and FEP for LAMMPS
+* Added Atomsk
 version 09/17/2023
 * Added a pseudopotential file for Quantum ESPRESSO
 version 08/17/2023
