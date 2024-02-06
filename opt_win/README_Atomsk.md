@@ -1,6 +1,6 @@
 ### Installing MSYS2
 
-See [README_MSYS2](/README_MSYS2.md)
+See [README_MSYS2](README_MSYS2.md)
 
 Additionally, install `mingw-w64-x86_64-lapack` by running:
 
@@ -42,6 +42,3 @@ $ make -f Makefile.static atomsk
 ### Distributing Atomsk
 
 Move the `atomsk.exe` binary to the `/opt_win/atomsk_b0.13.1/bin/` directory in the CygwinWM environment for distribution.
-```
-
-
