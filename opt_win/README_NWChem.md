@@ -1,6 +1,6 @@
 ### Installing MSYS2
 
-See [README_MSYS2](/README_MSYS2.md)
+See [README_MSYS2](README_MSYS2.md)
 
 However, to make it 32-bit, use MSYS2 MinGW x86
 
