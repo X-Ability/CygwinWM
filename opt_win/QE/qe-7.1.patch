@@ -1,0 +1,588 @@
+diff -ur qe-7.1/EPW/src/grid.f90 qe-7.1_rev/EPW/src/grid.f90
+--- qe-7.1/EPW/src/grid.f90	2022-08-03 17:02:17.122990900 +0900
++++ qe-7.1_rev/EPW/src/grid.f90	2022-08-07 21:40:55.320409000 +0900
+@@ -1345,7 +1345,7 @@
+ # if defined(__MPI)
+     !CALL MPI_TYPE_CREATE_F90_INTEGER(SIK2, int2type, ierr)
+     !CALL MPI_ALLreduce(MPI_IN_PLACE, s_save, nkpt_bzfst, int2type, MPI_SUM, world_comm, ierr)
+-    CALL MPI_ALLreduce(MPI_IN_PLACE, s_save, nkpt_bzfst, MPI_INTEGER2, MPI_SUM, world_comm, ierr)
++    CALL MPI_ALLREDUCE_IN_PLACE(s_save, nkpt_bzfst, MPI_INTEGER2, MPI_SUM, world_comm, ierr)
+ #endif
+     !
+     DEALLOCATE(equiv_loc, STAT = ierr)
+diff -ur qe-7.1/EPW/src/pw2wan2epw.f90 qe-7.1_rev/EPW/src/pw2wan2epw.f90
+--- qe-7.1/EPW/src/pw2wan2epw.f90	2022-08-03 17:02:17.260622600 +0900
++++ qe-7.1_rev/EPW/src/pw2wan2epw.f90	2022-08-07 21:40:55.361325200 +0900
+@@ -3501,7 +3501,7 @@
+       !
+ #if defined(__MPI)
+       IF (meta_ionode) THEN
+-        CALL MPI_REDUCE( MPI_IN_PLACE, wann_func, 2 * npol * ngridwf_max, MPI_DOUBLE_PRECISION, &
++        CALL MPI_REDUCE_IN_PLACE( wann_func, 2 * npol * ngridwf_max, MPI_DOUBLE_PRECISION, &
+                          MPI_SUM, meta_ionode_id, world_comm, ierr )
+       ELSE
+         CALL MPI_REDUCE( wann_func, wann_func, 2 * npol * ngridwf_max, MPI_DOUBLE_PRECISION, &
+diff -ur qe-7.1/FFTXlib/src/fft_helper_subroutines.f90 qe-7.1_rev/FFTXlib/src/fft_helper_subroutines.f90
+--- qe-7.1/FFTXlib/src/fft_helper_subroutines.f90	2022-08-03 17:01:42.507294400 +0900
++++ qe-7.1_rev/FFTXlib/src/fft_helper_subroutines.f90	2022-08-07 21:40:55.400974800 +0900
+@@ -55,9 +55,9 @@
+ 
+ #if defined(__MPI)
+      IF( noncolin) THEN
+-        CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_rho_nc, SIZE(tg_rho_nc), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
++        CALL MPI_ALLREDUCE_IN_PLACE( tg_rho_nc, SIZE(tg_rho_nc), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
+      ELSE
+-        CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_rho, SIZE(tg_rho), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
++        CALL MPI_ALLREDUCE_IN_PLACE( tg_rho, SIZE(tg_rho), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
+      END IF
+ #endif
+      !
+@@ -105,7 +105,7 @@
+ 
+      IF ( desc%nproc2 > 1 ) THEN
+ #if defined(__MPI)
+-        CALL MPI_ALLREDUCE( MPI_IN_PLACE, tmp_rhos, SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
++        CALL MPI_ALLREDUCE_IN_PLACE( tmp_rhos, SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
+ #endif
+      ENDIF
+      !
+@@ -127,13 +127,13 @@
+      TYPE(fft_type_descriptor), INTENT(in) :: desc
+      REAL(DP), INTENT(INOUT)  :: tmp_rhos(:,:)
+      REAL(DP), INTENT(OUT) :: rhos(:,:)
+-
++     
+      INTEGER :: ierr, from, ir3, ioff, nxyp, ioff_tg
+ !     write (*,*) ' enter tg_reduce_rho_3'
+ 
+      IF ( desc%nproc2 > 1 ) THEN
+ #if defined(__MPI)
+-        CALL MPI_ALLREDUCE( MPI_IN_PLACE, tmp_rhos, SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
++        CALL MPI_ALLREDUCE_IN_PLACE( tmp_rhos, SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
+ #endif
+      ENDIF
+      !
+@@ -158,13 +158,13 @@
+      TYPE(fft_type_descriptor), INTENT(in) :: desc
+      COMPLEX(DP), INTENT(INOUT)  :: tmp_rhos(:)
+      COMPLEX(DP), INTENT(OUT) :: rhos(:)
+-
++     
+      INTEGER :: ierr, from, ir3, ioff, nxyp, ioff_tg
+ !     write (*,*) ' enter tg_reduce_rho_4'
+ 
+      IF ( desc%nproc2 > 1 ) THEN
+ #if defined(__MPI)
+-        CALL MPI_ALLREDUCE( MPI_IN_PLACE, tmp_rhos, 2*SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
++        CALL MPI_ALLREDUCE_IN_PLACE( tmp_rhos, 2*SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
+ #endif
+      ENDIF
+      !
+@@ -195,7 +195,7 @@
+ 
+      IF ( desc%nproc2 > 1 ) THEN
+ #if defined(__MPI)
+-        CALL MPI_ALLREDUCE( MPI_IN_PLACE, tmp_rhos, 2*SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
++        CALL MPI_ALLREDUCE_IN_PLACE( tmp_rhos, 2*SIZE(tmp_rhos), MPI_DOUBLE_PRECISION, MPI_SUM, desc%comm2, ierr )
+ #endif
+      ENDIF
+      !
+diff -ur qe-7.1/FFTXlib/src/fft_types.f90 qe-7.1_rev/FFTXlib/src/fft_types.f90
+--- qe-7.1/FFTXlib/src/fft_types.f90	2022-08-03 17:01:42.662431000 +0900
++++ qe-7.1_rev/FFTXlib/src/fft_types.f90	2022-08-07 21:40:55.418410500 +0900
+@@ -280,7 +280,7 @@
+     end do
+ 
+     CALL realspace_grid_init( desc, at, bg, gcutm, fft_fact )
+-
++    
+     ALLOCATE( desc%nr2p ( desc%nproc2 ), desc%i0r2p( desc%nproc2 ) ) ; desc%nr2p = 0 ; desc%i0r2p = 0
+     ALLOCATE( desc%nr2p_offset ( desc%nproc2 ) ) ; desc%nr2p_offset = 0
+     ALLOCATE( desc%nr3p ( desc%nproc3 ), desc%i0r3p( desc%nproc3 ) ) ; desc%nr3p = 0 ; desc%i0r3p = 0
+@@ -1085,7 +1085,7 @@
+          dfft%nr1 = int ( sqrt (gcutm) * sqrt (at(1, 1)**2 + at(2, 1)**2 + at(3, 1)**2) ) + 1
+          dfft%nr2 = int ( sqrt (gcutm) * sqrt (at(1, 2)**2 + at(2, 2)**2 + at(3, 2)**2) ) + 1
+          dfft%nr3 = int ( sqrt (gcutm) * sqrt (at(1, 3)**2 + at(2, 3)**2 + at(3, 3)**2) ) + 1
+-
++         
+ #if defined (__DEBUG)
+          write (6,*) sqrt(gcutm)*sqrt(at(1,1)**2 + at(2,1)**2 + at(3,1)**2) , dfft%nr1
+          write (6,*) sqrt(gcutm)*sqrt(at(1,2)**2 + at(2,2)**2 + at(3,2)**2) , dfft%nr2
+@@ -1174,7 +1174,7 @@
+       END DO
+ 
+ #if defined(__MPI)
+-      CALL MPI_ALLREDUCE( MPI_IN_PLACE, nb, 3, MPI_INTEGER, MPI_MAX, dfft%comm, i )
++      CALL MPI_ALLREDUCE_IN_PLACE( nb, 3, MPI_INTEGER, MPI_MAX, dfft%comm, i )
+ #endif
+ 
+ ! ... the size of the 3d FFT matrix depends upon the maximum indices. With
+@@ -1183,7 +1183,7 @@
+       nr1 = 2 * nb(1) + 1
+       nr2 = 2 * nb(2) + 1
+       nr3 = 2 * nb(3) + 1
+-
++      
+       RETURN
+ 
+    END SUBROUTINE grid_set
+diff -ur qe-7.1/FFTXlib/src/stick_base.f90 qe-7.1_rev/FFTXlib/src/stick_base.f90
+--- qe-7.1/FFTXlib/src/stick_base.f90	2022-08-03 17:01:42.641487400 +0900
++++ qe-7.1_rev/FFTXlib/src/stick_base.f90	2022-08-07 21:40:55.440353800 +0900
+@@ -250,8 +250,8 @@
+ 
+ #if defined(__MPI)
+       IF( PRESENT( comm ) ) THEN
+-         CALL MPI_ALLREDUCE(MPI_IN_PLACE, st, size(st), MPI_INTEGER, MPI_SUM, comm, ierr)
+-         CALL MPI_ALLREDUCE(MPI_IN_PLACE, ngm, 1, MPI_INTEGER, MPI_SUM, comm, ierr)
++         CALL MPI_ALLREDUCE_IN_PLACE( st, size(st), MPI_INTEGER, MPI_SUM, comm, ierr)
++         CALL MPI_ALLREDUCE_IN_PLACE( ngm, 1, MPI_INTEGER, MPI_SUM, comm, ierr)
+       END IF
+ #endif
+ 
+@@ -583,7 +583,7 @@
+       CALL sticks_dist_new( smap%lgamma, smap%mype, smap%nproc, smap%nyfft, smap%iproc, smap%iproc2, &
+                             smap%ub, smap%lb, smap%idx, &
+                             smap%ist(:,1), smap%ist(:,2), ngc, SIZE(smap%idx), nstp, sstp, smap%stown, ng )
+-
++      
+       ! assign the owner of each (relavant) stick 
+       st = 0
+       DO ic = 1, SIZE( smap%idx )
+diff -ur qe-7.1/FFTXlib/src/tg_gather.f90 qe-7.1_rev/FFTXlib/src/tg_gather.f90
+--- qe-7.1/FFTXlib/src/tg_gather.f90	2022-08-03 17:01:42.815835800 +0900
++++ qe-7.1_rev/FFTXlib/src/tg_gather.f90	2022-08-07 21:40:55.461753200 +0900
+@@ -31,7 +31,7 @@
+ #if defined(__MPI)
+ !used to be   CALL mp_sum(tg_v, dffts%comm2 )
+   nsiz =dffts%nnr_tg
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
+   IF( ierr /= 0 ) CALL fftx_error__( ' tg_gather ', ' MPI_ALLREDUCE ', abs( ierr ) )
+ !- could be done (more efficintly?) with an ALLgatherv but the loigc of the ALLREDUCE is simpler
+ !  CALL MPI_Allgatherv( v(1), nsiz, MPI_DOUBLE_PRECISION, &
+@@ -74,7 +74,7 @@
+ #if defined(__MPI)
+ !used to be   CALL mp_sum(tg_v, dffts%comm2 )
+   nsiz =2 * dffts%nnr_tg
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
+   IF( ierr /= 0 ) CALL fftx_error__( ' tg_gather ', ' MPI_ALLREDUCE ', abs( ierr ) )
+ !- could be done (more efficintly?) with an ALLgatherv but the loigc of the ALLREDUCE is simpler
+ !  CALL MPI_Allgatherv( v(1), nsiz, MPI_DOUBLE_PRECISION, &
+@@ -136,7 +136,7 @@
+   nsiz =dffts%nnr_tg
+   ALLOCATE(tg_v_mpi(dffts%nnr_tg))
+   tg_v_mpi = tg_v_d
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_v_mpi, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( tg_v_mpi, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
+   IF( ierr /= 0 ) CALL fftx_error__( ' tg_gather ', ' MPI_ALLREDUCE ', abs( ierr ) )
+   tg_v_d = tg_v_mpi
+   DEALLOCATE(tg_v_mpi)
+@@ -197,7 +197,7 @@
+   nsiz =2 * dffts%nnr_tg
+   ALLOCATE(tg_v_mpi(dffts%nnr_tg))
+   tg_v_mpi = tg_v_d
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_v_mpi, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( tg_v_mpi, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
+   IF( ierr /= 0 ) CALL fftx_error__( ' tg_gather ', ' MPI_ALLREDUCE ', abs( ierr ) )
+   tg_v_d = tg_v_mpi
+   DEALLOCATE(tg_v_mpi)
+diff -ur qe-7.1/FFTXlib/tests/fft_test.f90 qe-7.1_rev/FFTXlib/tests/fft_test.f90
+--- qe-7.1/FFTXlib/tests/fft_test.f90	2022-08-03 17:01:42.457525600 +0900
++++ qe-7.1_rev/FFTXlib/tests/fft_test.f90	2022-08-07 21:40:55.491702000 +0900
+@@ -971,7 +971,7 @@
+        ngmpe = 0
+        ngmpe( mype + 1 ) = ngm
+        !CALL mp_sum( ngmpe, dfftp%comm )
+-       CALL MPI_ALLREDUCE( MPI_IN_PLACE, ngmpe, 1, MPI_INTEGER, MPI_SUM, dfftp%comm, ierr )
++       CALL MPI_ALLREDUCE_IN_PLACE( ngmpe, 1, MPI_INTEGER, MPI_SUM, dfftp%comm, ierr )
+        DO ng = 1, mype
+           ngm_offset = ngm_offset + ngmpe( ng )
+        END DO
+diff -ur qe-7.1/LAXlib/dspev_drv.f90 qe-7.1_rev/LAXlib/dspev_drv.f90
+--- qe-7.1/LAXlib/dspev_drv.f90	2022-08-03 17:01:41.730628800 +0900
++++ qe-7.1_rev/LAXlib/dspev_drv.f90	2022-08-07 21:40:55.525640800 +0900
+@@ -139,7 +139,7 @@
+            END DO
+ 
+ #if defined __MPI
+-           CALL MPI_ALLREDUCE( MPI_IN_PLACE, scalef, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
++           CALL MPI_ALLREDUCE_IN_PLACE( scalef, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+            IF( ierr /= 0 ) CALL lax_error__( ' ptredv ', 'error in mpi_allreduce 1', ierr )
+ #endif
+ 
+diff -ur qe-7.1/LAXlib/ptoolkit.f90 qe-7.1_rev/LAXlib/ptoolkit.f90
+--- qe-7.1/LAXlib/ptoolkit.f90	2022-08-03 17:01:41.436909400 +0900
++++ qe-7.1_rev/LAXlib/ptoolkit.f90	2022-08-07 21:40:55.575976300 +0900
+@@ -6307,7 +6307,7 @@
+           END DO
+        END IF
+ #if defined __MPI
+-       CALL MPI_ALLREDUCE( MPI_IN_PLACE, lambda_repl, SIZE(lambda_repl), MPI_DOUBLE_PRECISION, &
++       CALL MPI_ALLREDUCE_IN_PLACE( lambda_repl, SIZE(lambda_repl), MPI_DOUBLE_PRECISION, &
+                            MPI_SUM, ortho_parent_comm, ierr )
+ #endif
+        RETURN
+@@ -6339,7 +6339,7 @@
+           END DO
+        END IF
+ #if defined __MPI
+-       CALL MPI_ALLREDUCE( MPI_IN_PLACE, zmat_repl, SIZE(zmat_repl), MPI_DOUBLE_PRECISION, &
++       CALL MPI_ALLREDUCE_IN_PLACE( zmat_repl, SIZE(zmat_repl), MPI_DOUBLE_PRECISION, &
+                            MPI_SUM, ortho_parent_comm, ierr )
+ #endif
+        RETURN
+diff -ur qe-7.1/LAXlib/test.f90 qe-7.1_rev/LAXlib/test.f90
+--- qe-7.1/LAXlib/test.f90	2022-08-03 17:01:41.492762900 +0900
++++ qe-7.1_rev/LAXlib/test.f90	2022-08-07 21:40:55.616818400 +0900
+@@ -230,7 +230,7 @@
+   DEALLOCATE( c )
+   tempo_tutti(mype+1) = tempo(2)-tempo(1)
+ #if defined(__MPI)
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tempo_tutti, npes, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( tempo_tutti, npes, MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr )
+ #endif
+   if( mype == 0 ) then
+      write(6,*)
+@@ -290,9 +290,9 @@
+   end do
+   end do
+ #if defined(__MPI)
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, perf_matrix, SIZE(perf_matrix), MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr )
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, latency_matrix, SIZE(latency_matrix), MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr )
+-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, perf_count, SIZE(perf_count), MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( perf_matrix, SIZE(perf_matrix), MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( latency_matrix, SIZE(latency_matrix), MPI_DOUBLE_PRECISION, MPI_SUM, MPI_COMM_WORLD, ierr )
++  CALL MPI_ALLREDUCE_IN_PLACE( perf_count, SIZE(perf_count), MPI_INTEGER, MPI_SUM, MPI_COMM_WORLD, ierr )
+ #endif
+   if( mype == 0 ) then
+      write(6,*)
+diff -ur qe-7.1/LAXlib/zhpev_drv.f90 qe-7.1_rev/LAXlib/zhpev_drv.f90
+--- qe-7.1/LAXlib/zhpev_drv.f90	2022-08-03 17:01:41.464839800 +0900
++++ qe-7.1_rev/LAXlib/zhpev_drv.f90	2022-08-07 21:40:55.639902500 +0900
+@@ -224,7 +224,7 @@
+                 END IF
+ #if defined __MPI
+                 XNORM = XNORM ** 2
+-                CALL MPI_ALLREDUCE( MPI_IN_PLACE, xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
++                CALL MPI_ALLREDUCE_IN_PLACE( xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+                 IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 1', ierr )
+                 XNORM = SQRT( xnorm )
+ #endif
+@@ -258,7 +258,7 @@
+                     XNORM = DZNRM2( NI1, AP( I2, I ), 1 )
+ #if defined __MPI
+                     XNORM = XNORM ** 2
+-                    CALL MPI_ALLREDUCE( MPI_IN_PLACE, xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
++                    CALL MPI_ALLREDUCE_IN_PLACE( xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+                     IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 2', ierr )
+                     XNORM = SQRT( XNORM )
+ #endif
+@@ -359,7 +359,7 @@
+ 
+ #if defined __MPI
+                ! ... parallel sum TAU
+-               CALL MPI_ALLREDUCE( MPI_IN_PLACE, tau( i ), 2*(n - i + 1), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
++               CALL MPI_ALLREDUCE_IN_PLACE( tau( i ), 2*(n - i + 1), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+                IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 3', ierr )
+ #endif
+ !
+@@ -389,7 +389,7 @@
+                END IF
+ 
+ #if defined __MPI
+-               CALL MPI_ALLREDUCE( MPI_IN_PLACE, alpha, 2, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
++               CALL MPI_ALLREDUCE_IN_PLACE( alpha, 2, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+                IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 4', ierr )
+ #endif
+ 
+@@ -691,7 +691,7 @@
+               END IF
+ 
+ #if defined __MPI
+-              CALL MPI_ALLREDUCE( MPI_IN_PLACE, work, 2*(n - 1 - i), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
++              CALL MPI_ALLREDUCE_IN_PLACE( work, 2*(n - 1 - i), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+               IF( ierr /= 0 ) CALL lax_error__( ' pzupgtr ', 'error in mpi_allreduce 1', ierr )
+ #endif
+               !
+diff -ur qe-7.1/NEB/src/Makefile qe-7.1_rev/NEB/src/Makefile
+--- qe-7.1/NEB/src/Makefile	2022-08-03 17:01:51.855287500 +0900
++++ qe-7.1_rev/NEB/src/Makefile	2022-08-07 21:40:55.663289800 +0900
+@@ -5,7 +5,7 @@
+ # location of needed modules and included files (if any)
+ MODFLAGS= $(BASEMOD_FLAGS) \
+           $(MOD_FLAG)../../PW/src \
+-          $(MOD_FLAG)../../dft-d3/
++          $(MOD_FLAG)../../dft-d3
+ 
+ NEBOBJS = \
+ neb.o \
+diff -ur qe-7.1/PHonon/PH/elphon.f90 qe-7.1_rev/PHonon/PH/elphon.f90
+--- qe-7.1/PHonon/PH/elphon.f90	2022-08-03 17:01:25.014843600 +0900
++++ qe-7.1_rev/PHonon/PH/elphon.f90	2022-08-07 21:40:55.693753900 +0900
+@@ -1043,7 +1043,7 @@
+   enddo    ! jbnd
+ 
+ #if defined(__MPI)
+-  CALL MPI_ALLREDUCE(MPI_IN_PLACE,gf,3*nat*3*nat*el_ph_nsigma, &
++  CALL MPI_ALLREDUCE_IN_PLACE(gf,3*nat*3*nat*el_ph_nsigma, &
+                      MPI_DOUBLE_COMPLEX,MPI_SUM,intra_image_comm,ierr)
+ #endif
+ 
+diff -ur qe-7.1/PW/src/Makefile qe-7.1_rev/PW/src/Makefile
+--- qe-7.1/PW/src/Makefile	2022-08-03 17:01:59.782751100 +0900
++++ qe-7.1_rev/PW/src/Makefile	2022-08-07 21:40:55.720482200 +0900
+@@ -4,7 +4,7 @@
+ 
+ # location of needed modules and included files (if any)
+ MODFLAGS= $(BASEMOD_FLAGS) \
+-          $(MOD_FLAG)../../dft-d3/
++          $(MOD_FLAG)../../dft-d3
+ 
+ PWOBJS = \
+ pwscf.o 
+diff -ur qe-7.1/UtilXlib/mp.f90 qe-7.1_rev/UtilXlib/mp.f90
+--- qe-7.1/UtilXlib/mp.f90	2022-08-03 17:02:13.259686400 +0900
++++ qe-7.1_rev/UtilXlib/mp.f90	2022-08-07 21:40:55.740349600 +0900
+@@ -2238,7 +2238,8 @@
+         INTEGER, INTENT(IN) :: my_column_type
+         INTEGER, INTENT(IN) :: recvcount(:), displs(:)
+         INTEGER, INTENT(IN) :: root, gid
+-        INTEGER :: ierr, npe, myid
++        INTEGER :: ierr, npe, myid, l1, u1, l2, u2
++        COMPLEX(DP), allocatable :: alldata_(:,:)
+ 
+ #if defined (__MPI)
+         CALL mpi_comm_size( gid, npe, ierr )
+@@ -2248,13 +2249,15 @@
+         !
+         IF ( SIZE( recvcount ) < npe .OR. SIZE( displs ) < npe ) CALL mp_stop( 8071 )
+         !
+-        IF (myid==root) THEN
+-           CALL MPI_GATHERV( MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, &
+-                             alldata, recvcount, displs, my_column_type, root, gid, ierr )
+-        ELSE
+-           CALL MPI_GATHERV( alldata(1,displs(myid+1)+1), recvcount(myid+1), my_column_type, &
+-                             MPI_IN_PLACE, recvcount, displs, MPI_DATATYPE_NULL, root, gid, ierr )
+-        ENDIF
++        l1 = LBOUND(alldata,1)
++        u1 = UBOUND(alldata,1)
++        l2 = LBOUND(alldata,2)
++        u2 = UBOUND(alldata,2)
++        ALLOCATE(alldata_(l1:u1, l2:u2))
++        alldata_(l1:u1, l2:u2) = alldata(l1:u1, l2:u2)
++        CALL MPI_GATHERV( alldata_, recvcount(myid+1), my_column_type, &
++             alldata, recvcount, displs, my_column_type, root, gid, ierr )
++        deallocate( alldata_ )
+         IF (ierr/=0) CALL mp_stop( 8074 )
+ #endif
+         RETURN
+@@ -2270,8 +2273,9 @@
+         INTEGER, INTENT(IN) :: my_element_type
+         INTEGER, INTENT(IN) :: recvcount(:), displs(:)
+         INTEGER, INTENT(IN) :: gid
+-        INTEGER :: ierr, npe, myid
+-
++        INTEGER :: ierr, npe, myid, l1, u1, l2, u2
++        COMPLEX(DP), allocatable :: alldata_(:,:)
++        
+ #if defined (__MPI)
+         CALL mpi_comm_size( gid, npe, ierr )
+         IF (ierr/=0) CALL mp_stop( 8069 )
+@@ -2280,8 +2284,15 @@
+         !
+         IF ( SIZE( recvcount ) < npe .OR. SIZE( displs ) < npe ) CALL mp_stop( 8071 )
+         !
+-        CALL MPI_ALLGATHERV( MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, &
+-                             alldata, recvcount, displs, my_element_type, gid, ierr )
++        l1 = LBOUND(alldata,1)
++        u1 = UBOUND(alldata,1)
++        l2 = LBOUND(alldata,2)
++        u2 = UBOUND(alldata,2)
++        ALLOCATE(alldata_(l1:u1, l2:u2))
++        alldata_(l1:u1, l2:u2) = alldata(l1:u1, l2:u2)
++        CALL MPI_ALLGATHERV( alldata_, recvcount(myid+1), my_element_type, &
++             alldata, recvcount, displs, my_element_type, gid, ierr )
++        deallocate( alldata_ )
+         IF (ierr/=0) CALL mp_stop( 8074 )
+ #endif
+         RETURN
+@@ -2294,7 +2305,8 @@
+         INTEGER, INTENT(IN) :: my_element_type
+         INTEGER, INTENT(IN) :: recvcount(:), displs(:)
+         INTEGER, INTENT(IN) :: gid
+-        INTEGER :: ierr, npe, myid
++        INTEGER :: ierr, npe, myid, l1, u1, l2, u2
++        REAL(DP), allocatable :: alldata_(:,:)
+ 
+ #if defined (__MPI)
+         CALL mpi_comm_size( gid, npe, ierr )
+@@ -2304,8 +2316,15 @@
+         !
+         IF ( SIZE( recvcount ) < npe .OR. SIZE( displs ) < npe ) CALL mp_stop( 8071 )
+         !
+-        CALL MPI_ALLGATHERV( MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, &
+-                             alldata, recvcount, displs, my_element_type, gid, ierr )
++        l1 = LBOUND(alldata,1)
++        u1 = UBOUND(alldata,1)
++        l2 = LBOUND(alldata,2)
++        u2 = UBOUND(alldata,2)
++        ALLOCATE(alldata_(l1:u1, l2:u2))
++        alldata_(l1:u1, l2:u2) = alldata(l1:u1, l2:u2)
++        CALL MPI_ALLGATHERV( alldata_, recvcount(myid+1), my_element_type, &
++             alldata, recvcount, displs, my_element_type, gid, ierr )
++        deallocate( alldata_ )
+         IF (ierr/=0) CALL mp_stop( 8074 )
+ #endif
+         RETURN
+diff -ur qe-7.1/UtilXlib/mp_base.f90 qe-7.1_rev/UtilXlib/mp_base.f90
+--- qe-7.1/UtilXlib/mp_base.f90	2022-08-03 17:02:13.391929700 +0900
++++ qe-7.1_rev/UtilXlib/mp_base.f90	2022-08-07 21:40:55.755485900 +0900
+@@ -309,14 +309,14 @@
+      CALL mpi_comm_rank( comm, myid, info )
+      IF( info /= 0 ) CALL errore( 'reduce_base_real', 'error in mpi_comm_rank', info )
+      IF (myid == root) THEN
+-        CALL MPI_REDUCE( MPI_IN_PLACE, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, root, comm, info )
++        CALL MPI_REDUCE_IN_PLACE( ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, root, comm, info )
+         IF( info /= 0 ) CALL errore( 'reduce_base_real', 'error in mpi_reduce 1', info )
+      ELSE
+         CALL MPI_REDUCE( ps, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, root, comm, info )
+         IF( info /= 0 ) CALL errore( 'reduce_base_real', 'error in mpi_reduce 1', info )
+      ENDIF
+   ELSE
+-     CALL MPI_ALLREDUCE( MPI_IN_PLACE, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, comm, info )
++     CALL MPI_ALLREDUCE_IN_PLACE( ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, comm, info )
+      IF( info /= 0 ) CALL errore( 'reduce_base_real', 'error in mpi_allreduce 1', info )
+   END IF
+   !
+@@ -470,14 +470,14 @@
+     CALL mpi_comm_rank( comm, myid, info )
+     IF( info /= 0 ) CALL errore( 'reduce_base_integer', 'error in mpi_comm_rank', info )
+     IF (myid == root) THEN
+-      CALL MPI_REDUCE(MPI_IN_PLACE, ps, dim, MPI_INTEGER, MPI_SUM, root, comm, info)
++      CALL MPI_REDUCE_IN_PLACE( ps, dim, MPI_INTEGER, MPI_SUM, root, comm, info)
+       IF(info /= 0) CALL errore('reduce_base_integer', 'error in mpi_reduce 1', info)
+     ELSE
+       CALL MPI_REDUCE(ps, ps, dim, MPI_INTEGER, MPI_SUM, root, comm, info)
+       IF(info /= 0) CALL errore('reduce_base_integer', 'error in mpi_reduce 1', info)
+     ENDIF
+   ELSE
+-    CALL MPI_ALLREDUCE(MPI_IN_PLACE, ps, dim, MPI_INTEGER, MPI_SUM, comm, info)
++    CALL MPI_ALLREDUCE_IN_PLACE( ps, dim, MPI_INTEGER, MPI_SUM, comm, info)
+     IF(info /= 0 ) CALL errore('reduce_base_integer', 'error in mpi_allreduce 1', info)
+   ENDIF
+   !
+@@ -528,14 +528,14 @@
+     CALL mpi_comm_rank( comm, myid, info )
+     IF( info /= 0 ) CALL errore( 'reduce_base_integer8', 'error in mpi_comm_rank', info )
+     IF (myid == root) THEN
+-      CALL MPI_REDUCE(MPI_IN_PLACE, ps, dim, MPI_INTEGER8, MPI_SUM, root, comm, info)
++      CALL MPI_REDUCE_IN_PLACE( ps, dim, MPI_INTEGER8, MPI_SUM, root, comm, info)
+       IF(info /= 0) CALL errore('reduce_base_integer8', 'error in mpi_reduce 1', info)
+     ELSE
+       CALL MPI_REDUCE(ps, ps, dim, MPI_INTEGER8, MPI_SUM, root, comm, info)
+       IF(info /= 0) CALL errore('reduce_base_integer8', 'error in mpi_reduce 1', info)
+     ENDIF
+   ELSE
+-    CALL MPI_ALLREDUCE(MPI_IN_PLACE, ps, dim, MPI_INTEGER8, MPI_SUM, comm, info)
++    CALL MPI_ALLREDUCE_IN_PLACE( ps, dim, MPI_INTEGER8, MPI_SUM, comm, info)
+     IF(info /= 0 ) CALL errore('reduce_base_integer8', 'error in mpi_allreduce 1', info)
+   ENDIF
+   !
+@@ -1297,3 +1297,39 @@
+   RETURN
+   !
+ END SUBROUTINE parallel_max_real
++
++subroutine mpi_allreduce_in_place(b, n, type, op, comm, ierror)
++  USE parallel_include  
++  implicit none
++  byte, intent(inout) :: b(*)
++  integer, intent(in) :: n, type, op, comm
++  integer, intent(out) :: ierror
++  byte, allocatable :: b_(:)
++  integer :: size
++
++#if defined (__MPI)
++
++  if( type == MPI_INTEGER ) then
++     size = 4
++  else if( type == MPI_INTEGER2 ) then
++     size = 2
++  else if( type == MPI_INTEGER8 ) then
++     size = 8
++  else if( type == MPI_DOUBLE_PRECISION ) then
++     size = 8
++  else
++     write(*,*) "Unknown MPI type."
++     call abort()
++  end if
++
++  size = size * n
++  
++  allocate(b_(size))
++  b_(1:size) = b(1:size)
++  CALL MPI_ALLREDUCE( b_, b, n, type, op, comm, ierror )
++  deallocate(b_)
++
++#endif
++
++end subroutine mpi_allreduce_in_place
++
+diff -ur qe-7.1/environment_variables qe-7.1_rev/environment_variables
+--- qe-7.1/environment_variables	2022-08-03 17:02:08.949974500 +0900
++++ qe-7.1_rev/environment_variables	2022-08-07 21:41:56.487464200 +0900
+@@ -67,6 +67,7 @@
+ #  data may not work and human inspection of the results may be needed.
+ 
+ PREFIX=`cd ../../.. ; pwd`
++PREFIX=`echo $PREFIX | sed -e 's/^\/\(.\)\//\1:\//g'`
+ # $PREFIX is the root of the Quantum ESPRESSO source tree.
+ BIN_DIR=$PREFIX/bin
+ PSEUDO_DIR=$PREFIX/pseudo
+diff -ur qe-7.1/external/devxlib/src/timer.c qe-7.1_rev/external/devxlib/src/timer.c
+--- qe-7.1/external/devxlib/src/timer.c	2022-08-03 17:02:21.769772200 +0900
++++ qe-7.1_rev/external/devxlib/src/timer.c	2022-08-07 21:40:55.771442900 +0900
+@@ -1,7 +1,7 @@
+ #include <time.h>
+ 
+ #include <sys/types.h>
+-#include <sys/times.h>
++//#include <sys/times.h>
+ #include <sys/time.h>
+ 
+ 
+diff -ur qe-7.1/external/fox/utils/fox_m_utils_uri.F90 qe-7.1_rev/external/fox/utils/fox_m_utils_uri.F90
+--- qe-7.1/external/fox/utils/fox_m_utils_uri.F90	2022-08-03 17:02:19.193622900 +0900
++++ qe-7.1_rev/external/fox/utils/fox_m_utils_uri.F90	2022-08-07 21:40:55.810933500 +0900
+@@ -414,7 +414,7 @@
+ 
+     if (len(URIstring)>3) then
+       ! is this a M$ windoze absolute path ?    eg of the form "C:/path_segments"  
+-      if ((scan(URIstring(1:1),alpha)>0).and.(URIstring(2:3)==':/') ) then
++      if ((scan(URIstring(1:1),alpha)>0).and.(URIstring(2:3)==':\') ) then
+         ! no point in attempting to decode as a uri, it contains only a windows path 
+         scheme => vs_str_alloc("file")
+         path => unEscape_alloc(URIstring)
+diff -ur qe-7.1/test-suite/testcode/lib/testcode2/__init__.py qe-7.1_rev/test-suite/testcode/lib/testcode2/__init__.py
+--- qe-7.1/test-suite/testcode/lib/testcode2/__init__.py	2022-08-03 17:01:49.450651800 +0900
++++ qe-7.1_rev/test-suite/testcode/lib/testcode2/__init__.py	2022-08-07 21:40:55.788992900 +0900
+@@ -357,7 +357,7 @@
+             if verbose > 2:
+                 print(('Running test using %s in %s\n' % (cmd, self.path)))
+             try:
+-                job = subprocess.Popen(cmd, shell=True)
++                job = subprocess.Popen("bash " + cmd, shell=True)
+             except OSError:
+                 # slightly odd syntax in order to be compatible with python 2.5
+                 # and python 2.6/3
+@@ -556,7 +556,7 @@
+                     if verbose > 2:
+                         print(('Analysing output using %s in %s.' %
+                                 (cmd, self.path)))
+-                    extract_popen = subprocess.run(cmd, shell=True,
++                    extract_popen = subprocess.run("bash " + cmd, shell=True,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                 except OSError:
+                     # slightly odd syntax in order to be compatible with python
