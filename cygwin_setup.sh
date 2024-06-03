@@ -175,6 +175,45 @@ function InstallOpenMX() {
   mv MX_TRAP.sh /usr/local/openmx3.8/work/MX_TRAP.sh
 }
 
+# OpenMX3.9
+# http://www.openmx-square.org/download.html
+# https://ja.osdn.net/projects/fermisurfer/releases/
+# https://www.netlib.org/scalapack/
+function InstallOpenMX3.9() {
+  rm -rf /usr/local/openmx3.9
+  rm -rf /usr/local/fermisurfer
+  wget https://winmostar.com/wm/cygwin_wm/packages/openmx3.9.tar.gz
+  wget https://winmostar.com/wm/cygwin_wm/packages/patch3.9.9.tar
+  wget https://winmostar.com/wm/cygwin_wm/packages/openmx3.9.9.patch
+  wget https://winmostar.com/wm/cygwin_wm/packages/fermisurfer_1.7.1.zip
+  wget https://winmostar.com/wm/cygwin_wm/packages/scalapack-2.1.0.tgz
+  wget https://winmostar.com/wm/cygwin_wm/packages/scalapack-2.1.0.patch
+
+  rm -fr scalapack-2.1.0
+  tar xvfz scalapack-2.1.0.tgz
+  patch -u -p0 < scalapack-2.1.0.patch
+  cd scalapack-2.1.0
+  make
+  cd ..
+
+  rm -fr openmx3.9
+  tar xvfz openmx3.9.tar.gz
+  cd openmx3.9/source
+  tar xvf ../../patch3.9.9.tar
+  cd ../..
+  patch -u -p0 < openmx3.9.9.patch
+  cd openmx3.9/source
+  cp ../../scalapack-2.1.0/libscalapack.a .
+  make || exit 1
+  make install || exit 1
+  gcc bandgnu13.c -lm -o ../work/bandgnu13.exe || exit 1
+  make DosMain || exit 1
+  cd ../..
+  mv openmx3.9 /usr/local
+  unzip fermisurfer_1.7.1.zip
+  mv fermisurfer /usr/local/
+}
+
 # https://pypi.python.org/pypi/phonopy/1.12.6.53
 function InstallPhonopy() {
   pip3.9 install pkgconfig || exit 1
@@ -356,6 +395,8 @@ export PATH=\$PATH:/usr/local/acpype
 export PATH=\$PATH:/usr/local/MODYLAS_1.0.4/bin
 export PATH=\$PATH:/usr/local/openmx3.8/work:/usr/local/fermisurfer/bin
 export OPENMX_DATA_PATH=/usr/local/openmx3.8/DFT_DATA13
+#export PATH=\$PATH:/usr/local/openmx3.9/work:/usr/local/fermisurfer/bin
+#export OPENMX_DATA_PATH=/usr/local/openmx3.9/DFT_DATA19
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/src
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PerlChemistry=/usr/local/MATCH_RELEASE/PerlChemistry
