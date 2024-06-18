@@ -393,10 +393,10 @@ source /usr/local/gromacs_sse/bin/GMXRC
 source /usr/local/amber18/amber.sh
 export PATH=\$PATH:/usr/local/acpype
 export PATH=\$PATH:/usr/local/MODYLAS_1.0.4/bin
-export PATH=\$PATH:/usr/local/openmx3.8/work:/usr/local/fermisurfer/bin
-export OPENMX_DATA_PATH=/usr/local/openmx3.8/DFT_DATA13
-#export PATH=\$PATH:/usr/local/openmx3.9/work:/usr/local/fermisurfer/bin
-#export OPENMX_DATA_PATH=/usr/local/openmx3.9/DFT_DATA19
+#export PATH=\$PATH:/usr/local/openmx3.8/work:/usr/local/fermisurfer/bin
+#export OPENMX_DATA_PATH=/usr/local/openmx3.8/DFT_DATA13
+export PATH=\$PATH:/usr/local/openmx3.9/work:/usr/local/fermisurfer/bin
+export OPENMX_DATA_PATH=/usr/local/openmx3.9/DFT_DATA19
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/src
 export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PerlChemistry=/usr/local/MATCH_RELEASE/PerlChemistry
@@ -438,25 +438,26 @@ fi
 # os.symlink of python2.7 makes symbolic links to /mnt/ for windows paths
 ln -s /cygdrive /mnt
 
-InstallMPICH2
-InstallOpenBabel
-InstallGromacs
-InstallAmberTools18
-InstallAcpype18
-InstallERmod
-InstallMODYLAS
-InstallOpenMX
-InstallBoltzTraP
-InstallMATCH
-InstallConditionalERmod
-InstallEnumlib
-InstallPackmol
-InstallMktop
-InstallPhonopy
-InstallMDTraj
-InstallParmEd
-InstallASE
-InstallTowhee
-InstallBader
+#InstallMPICH2
+#InstallOpenBabel
+#InstallGromacs
+#InstallAmberTools18
+#InstallAcpype18
+#InstallERmod
+#InstallMODYLAS
+#InstallOpenMX
+InstallOpenMX3.9
+#InstallBoltzTraP
+#InstallMATCH
+#InstallConditionalERmod
+#InstallEnumlib
+#InstallPackmol
+#InstallMktop
+#InstallPhonopy
+#InstallMDTraj
+#InstallParmEd
+#InstallASE
+#InstallTowhee
+#InstallBader
 
 date

@@ -1,5 +1,5 @@
 
-CLEAN_INSTALL = True
+CLEAN_INSTALL = False
 INSTALL_QE_LMP = False
 
 Set objShell    = WScript.CreateObject("WScript.Shell")

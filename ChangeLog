@@ -1,3 +1,5 @@
+version 07/01/2024
+* Added OpenMX3.9
 version 02/01/2024
 * Optimized Acpype performance
 * Added package EXTRA-FIX, FEP, TALLY and COLVARS for LAMMPS
