@@ -438,26 +438,26 @@ fi
 # os.symlink of python2.7 makes symbolic links to /mnt/ for windows paths
 ln -s /cygdrive /mnt
 
-#InstallMPICH2
-#InstallOpenBabel
-#InstallGromacs
-#InstallAmberTools18
-#InstallAcpype18
-#InstallERmod
-#InstallMODYLAS
+InstallMPICH2
+InstallOpenBabel
+InstallGromacs
+InstallAmberTools18
+InstallAcpype18
+InstallERmod
+InstallMODYLAS
 #InstallOpenMX
 InstallOpenMX3.9
-#InstallBoltzTraP
-#InstallMATCH
-#InstallConditionalERmod
-#InstallEnumlib
-#InstallPackmol
-#InstallMktop
-#InstallPhonopy
-#InstallMDTraj
-#InstallParmEd
-#InstallASE
-#InstallTowhee
-#InstallBader
+InstallBoltzTraP
+InstallMATCH
+InstallConditionalERmod
+InstallEnumlib
+InstallPackmol
+InstallMktop
+InstallPhonopy
+InstallMDTraj
+InstallParmEd
+InstallASE
+InstallTowhee
+InstallBader
 
 date
