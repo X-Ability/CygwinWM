@@ -83,6 +83,55 @@ function InstallGromacs() {
 }
 
 
+# http://www.gromacs.org/Downloads
+function InstallGromacs2024.4() {
+  rm -rf /usr/local/gromacs2024.4_sse
+  rm -rf /usr/local/gromacs2024.4_avx
+  wget https://winmostar.com/wm/cygwin_wm/packages/gromacs-2024.4.tar.gz
+  rm -fr gromacs-2024.4
+  tar xfz gromacs-2024.4.tar.gz
+  cd gromacs-2024.4
+
+  OPT_COMMON="-DGMX_BUILD_OWN_FFTW=ON -DGMX_GPU=OFF -DGMX_USE_RDTSCP=OFF -DBUILD_SHARED_LIBS=OFF "
+  OPT_SSE="-DGMX_SIMD=SSE2    -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs2024.4_sse "
+  OPT_AVX="-DGMX_SIMD=AVX_256 -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs2024.4_avx "
+  OPT_SINGLE="-DGMX_DOUBLE=OFF "
+  OPT_DOUBLE="-DGMX_DOUBLE=ON  "
+
+# To undefine HAVE_SCHED_AFFINITY
+  sed -i.bak -e 's/^.*Affinity.*$//g' -e 's/^.*AFFINITY.*$//g' CMakeLists.txt 
+
+#  mkdir build_sse
+#  cd build_sse
+#  cmake .. $OPT_COMMON $OPT_SSE $OPT_SINGLE || exit 1
+#  make -j 4 || exit 1
+#  make install || exit 1
+#  cd ..
+
+#  mkdir build_sse_d
+#  cd build_sse_d
+#  cmake .. $OPT_COMMON $OPT_SSE $OPT_DOUBLE || exit 1
+#  make -j 4 || exit 1
+#  make install || exit 1
+#  cd ..
+
+  mkdir build_avx
+  cd build_avx
+  cmake .. $OPT_COMMON $OPT_AVX $OPT_SINGLE || exit 1
+  make -j 4 || exit 1
+  make install || exit 1
+  cd ..
+
+  mkdir build_avx_d
+  cd build_avx_d
+  cmake .. $OPT_COMMON $OPT_AVX $OPT_DOUBLE || exit 1
+  make -j 4 || exit 1
+  make install || exit 1
+  cd ..
+
+  cd ..
+}
+
 # http://ambermd.org/GetAmber.php#ambertools
 function InstallAmberTools18() {
   rm -rf /usr/local/amber18/
@@ -387,8 +436,10 @@ export PATH=\`echo \$PATH | awk -v RS=: '{print \$0}' | \\
   grep -v "LAMMPS" | \\
   awk -v ORS=: '{print \$0}'\`
 export PATH=\$PATH:/usr/local/mpich2-1.5/bin
-source /usr/local/gromacs_sse/bin/GMXRC
+#source /usr/local/gromacs_sse/bin/GMXRC
 #source /usr/local/gromacs_avx/bin/GMXRC
+#source /usr/local/gromacs2024.4_sse/bin/GMXRC
+source /usr/local/gromacs2024.4_avx/bin/GMXRC
 #source /usr/local/amber18/amber.sh
 source /usr/local/amber18/amber.sh
 export PATH=\$PATH:/usr/local/acpype
@@ -441,6 +492,7 @@ ln -s /cygdrive /mnt
 InstallMPICH2
 InstallOpenBabel
 InstallGromacs
+#InstallGromacs2024.4
 InstallAmberTools18
 InstallAcpype18
 InstallERmod
