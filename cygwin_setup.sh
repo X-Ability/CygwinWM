@@ -437,10 +437,9 @@ export PATH=\`echo \$PATH | awk -v RS=: '{print \$0}' | \\
   awk -v ORS=: '{print \$0}'\`
 export PATH=\$PATH:/usr/local/mpich2-1.5/bin
 #source /usr/local/gromacs_sse/bin/GMXRC
-#source /usr/local/gromacs_avx/bin/GMXRC
+source /usr/local/gromacs_avx/bin/GMXRC
 #source /usr/local/gromacs2024.4_sse/bin/GMXRC
-source /usr/local/gromacs2024.4_avx/bin/GMXRC
-#source /usr/local/amber18/amber.sh
+#source /usr/local/gromacs2024.4_avx/bin/GMXRC
 source /usr/local/amber18/amber.sh
 export PATH=\$PATH:/usr/local/acpype
 export PATH=\$PATH:/usr/local/MODYLAS_1.0.4/bin
