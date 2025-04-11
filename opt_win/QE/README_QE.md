@@ -79,6 +79,7 @@ Create a package using the following steps:
 ```shell
 $ mkdir -p dist/pseudo
 $ cp -r bin dist
+$ cp -r Doc dist
 $ cd dist/bin
 $ strip *x
 $ for f in *.x; do mv $f ${f%.x}.exe; done
