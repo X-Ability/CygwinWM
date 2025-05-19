@@ -344,14 +344,14 @@ function InstallEnumlib() {
 # https://github.com/mcubeg/packmol/releases
 function InstallPackmol() {
   rm -rf /usr/local/packmol-18.166
-  wget https://winmostar.com/wm/cygwin_wm/packages/packmol-18.166.zip
-  rm -fr packmol-18.166
-  unzip packmol-18.166.zip
-  cd packmol-18.166
+  wget https://winmostar.com/wm/cygwin_wm/packages/packmol-21.0.2.tar.gz
+  rm -fr packmol-21.0.2
+  tar xvfz packmol-21.0.2.tar.gz
+  cd packmol-21.0.2
   ./configure `which gfortran` || exit 1
   make || exit 1
   cd ..
-  mv packmol-18.166 /usr/local/
+  mv packmol-21.0.2 /usr/local/
 }
 
 # http://www.aribeiro.net.br/mktop/
@@ -452,7 +452,7 @@ export PATH=\$PATH:/usr/local/boltztrap-1.2.5/util
 export PerlChemistry=/usr/local/MATCH_RELEASE/PerlChemistry
 export MATCH=/usr/local/MATCH_RELEASE/MATCH
 export PATH=\$PATH:/usr/local/MATCH_RELEASE/MATCH/scripts
-export PATH=\$PATH:/usr/local/packmol-18.166
+export PATH=\$PATH:/usr/local/packmol-21.0.2
 export PATH=\$PATH:/usr/local/mktop_2.2.1
 export PATH=\$PATH:/usr/local/towhee-8.2.3/bin
 export TOWHEE_FF_PATH=/usr/local/towhee-8.2.3/ForceFields
