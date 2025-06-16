@@ -1,6 +1,6 @@
-version 04/13/2025
-* Added ffmpeg
-* Added Documents for Quantum ESPRESSO
+version 07/01/2025
+* Changed default Gromacs version to 2024.4
+* Changed packmol version to 21.0.2
 version 11/08/2024
 * Added Gromacs2024.4
 version 10/04/2024
