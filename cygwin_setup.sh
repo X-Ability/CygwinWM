@@ -343,7 +343,6 @@ function InstallEnumlib() {
 
 # https://github.com/mcubeg/packmol/releases
 function InstallPackmol() {
-  rm -rf /usr/local/packmol-18.166
   wget https://winmostar.com/wm/cygwin_wm/packages/packmol-21.0.2.tar.gz
   rm -fr packmol-21.0.2
   tar xvfz packmol-21.0.2.tar.gz
@@ -491,12 +490,12 @@ ln -s /cygdrive /mnt
 InstallMPICH2
 InstallOpenBabel
 InstallGromacs
-#InstallGromacs2024.4
+InstallGromacs2024.4
 InstallAmberTools18
 InstallAcpype18
 InstallERmod
 InstallMODYLAS
-#InstallOpenMX
+InstallOpenMX
 InstallOpenMX3.9
 InstallBoltzTraP
 InstallMATCH
