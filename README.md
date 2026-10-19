@@ -36,6 +36,15 @@ $  /bin/rebase -s -v /lib/python3.7/site-packages/Cython-0.29.13-py3.7-cygwin-3.
 ```
 3. Restart cygwin_setup.vbs as described above.
 
+## WARNING
+
+- The following Quantum ESPRESSO pseudopotential files are actually ultrasoft pseudopotentials (USPPs), despite their filenames indicating PAW:
+   - B.pbe-n-kjpaw_psl.0.1.UPF
+   - B.pbesol-n-kjpaw_psl.0.1.UPF
+   - B.rel-pbe-n-kjpaw_psl.0.1.UPF
+   - B.rel-pbesol-n-kjpaw_psl.0.1.UPF
+The same discrepancy exists in the files available on the official Quantum ESPRESSO website, from which these files were obtained.
+
 ## License
 
 | Package          | License    | Remarks                          | Version     | Reference                                                                        |
